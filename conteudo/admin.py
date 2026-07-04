@@ -1,0 +1,256 @@
+from django.contrib import admin
+from django.utils.html import format_html
+from django.db.models import Count
+from .models import Categoria, Conteudo, Banner, ConfiguracaoSite, Comentario
+from .forms import BannerAdminForm, ConteudoAdminForm
+
+
+# ── Customização global do Admin ──────────────────────────────────────
+admin.site.site_header = 'Currículo SEDU — Painel Administrativo'
+admin.site.site_title = 'Currículo SEDU Admin'
+admin.site.index_title = 'Gerenciar conteúdo do site'
+
+
+# ── Categoria ─────────────────────────────────────────────────────────
+@admin.register(Categoria)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'categoria_pai', 'ordem', 'ativa', 'total_conteudos']
+    list_filter = ['ativa', 'categoria_pai']
+    list_editable = ['ordem', 'ativa']
+    search_fields = ['nome']
+    prepopulated_fields = {'slug': ('nome',)}
+
+    fieldsets = (
+        (None, {
+            'fields': ('nome', 'slug', 'descricao', 'categoria_pai')
+        }),
+        ('Aparência', {
+            'fields': ('icone', 'imagem', 'ordem', 'ativa'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def total_conteudos(self, obj):
+        count = obj.conteudos.filter(status='publicado').count()
+        return count
+    total_conteudos.short_description = 'Publicados'
+
+
+# ── Conteúdo ──────────────────────────────────────────────────────────
+@admin.register(Conteudo)
+class ConteudoAdmin(admin.ModelAdmin):
+    form = ConteudoAdminForm
+    list_display = ['titulo', 'tipo_badge', 'area_destino', 'status_badge', 'destaque', 'data_publicacao']
+    list_filter = ['tipo', 'status', 'destaque', 'categoria__categoria_pai', 'categoria']
+    list_editable = ['destaque']
+    search_fields = ['titulo', 'resumo', 'corpo']
+    date_hierarchy = 'data_publicacao'
+    prepopulated_fields = {'slug': ('titulo',)}
+
+    fieldsets = (
+        ('📍 Onde publicar no site', {
+            'fields': ('categoria',),
+            'description': (
+                'Escolha em qual área do site este conteúdo vai aparecer. '
+                'As opções mostram a categoria pai → subcategoria (ex: Documentos Curriculares → Currículo Atual). '
+                'Para aparecer direto em uma categoria principal, selecione apenas ela.'
+            ),
+        }),
+        ('📝 Informações básicas', {
+            'fields': ('titulo', 'slug', 'tipo', 'resumo'),
+        }),
+        ('📄 Conteúdo', {
+            'fields': ('corpo',),
+            'description': 'Use para posts e páginas com texto formatado.',
+        }),
+        ('📎 Arquivo / Mídia / Link', {
+            'fields': ('arquivo', 'url_video', 'url_externa', 'imagem_destaque'),
+            'description': (
+                'Documento PDF: use "Arquivo". '
+                'Vídeo YouTube/Vimeo: use "URL do vídeo". '
+                'Site externo: use "Link externo".'
+            ),
+            'classes': ('collapse',),
+        }),
+        ('⚙️ Publicação', {
+            'fields': ('status', 'destaque', 'ordem', 'autor', 'data_publicacao'),
+            'description': 'Status "Publicado" torna o conteúdo visível no site. "Destaque" aparece na home.',
+        }),
+    )
+
+    def area_destino(self, obj):
+        """Mostra de forma clara onde o conteúdo vai aparecer no site."""
+        if not obj.categoria:
+            return format_html('<span style="color:#9ca3af; font-size:12px;">— sem área —</span>')
+        if obj.categoria.categoria_pai:
+            return format_html(
+                '<span style="font-size:12px; color:#6b7280;">{}</span>'
+                '<br><strong style="color:#2d5a8e;">{}</strong>',
+                obj.categoria.categoria_pai.nome,
+                obj.categoria.nome,
+            )
+        return format_html(
+            '<strong style="color:#2d5a8e;">{}</strong>',
+            obj.categoria.nome,
+        )
+    area_destino.short_description = 'Área no site'
+    area_destino.admin_order_field = 'categoria__nome'
+
+    def tipo_badge(self, obj):
+        cores = {
+            'documento': '#2563eb',
+            'video': '#dc2626',
+            'post': '#059669',
+            'link': '#7c3aed',
+            'pagina': '#d97706',
+        }
+        cor = cores.get(obj.tipo, '#6b7280')
+        return format_html(
+            '<span style="background:{}; color:white; padding:3px 10px; '
+            'border-radius:12px; font-size:11px; font-weight:600;">{}</span>',
+            cor, obj.get_tipo_display()
+        )
+    tipo_badge.short_description = 'Tipo'
+    tipo_badge.admin_order_field = 'tipo'
+
+    def status_badge(self, obj):
+        cores = {
+            'rascunho': '#f59e0b',
+            'publicado': '#10b981',
+            'arquivado': '#6b7280',
+        }
+        cor = cores.get(obj.status, '#6b7280')
+        return format_html(
+            '<span style="background:{}; color:white; padding:3px 10px; '
+            'border-radius:12px; font-size:11px; font-weight:600;">{}</span>',
+            cor, obj.get_status_display()
+        )
+    status_badge.short_description = 'Status'
+    status_badge.admin_order_field = 'status'
+
+    actions = ['publicar_selecionados', 'arquivar_selecionados']
+
+    @admin.action(description='✅ Publicar selecionados')
+    def publicar_selecionados(self, request, queryset):
+        queryset.update(status='publicado')
+
+    @admin.action(description='📦 Arquivar selecionados')
+    def arquivar_selecionados(self, request, queryset):
+        queryset.update(status='arquivado')
+
+
+# ── Banner ────────────────────────────────────────────────────────────
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    form = BannerAdminForm
+    list_display = ['titulo', 'area_banner', 'preview_imagem', 'ordem', 'ativo']
+    list_editable = ['ordem', 'ativo']
+
+    fieldsets = (
+        ('📍 Onde este banner vai aparecer', {
+            'fields': ('categoria',),
+            'description': (
+                'Clique em um botão abaixo para escolher onde o banner será exibido. '
+                'Escolha "Página inicial" para aparecer no topo do site, '
+                'ou selecione uma área específica para aparecer dentro daquela seção.'
+            ),
+        }),
+        ('📝 Conteúdo do banner', {
+            'fields': ('titulo', 'subtitulo', 'link'),
+        }),
+        ('🖼️ Imagem', {
+            'fields': ('imagem',),
+            'description': 'Recomendado: imagem horizontal (1200×400px ou similar).',
+        }),
+        ('⚙️ Exibição', {
+            'fields': ('ordem', 'ativo'),
+        }),
+    )
+
+    def area_banner(self, obj):
+        if not obj.categoria:
+            return format_html(
+                '<span style="background:#0369a1;color:white;padding:3px 10px;'
+                'border-radius:12px;font-size:11px;font-weight:600;">🏠 Home</span>'
+            )
+        if obj.categoria.categoria_pai:
+            return format_html(
+                '<span style="font-size:11px;color:#6b7280;">{}</span> → '
+                '<strong style="color:#2d5a8e;">{}</strong>',
+                obj.categoria.categoria_pai.nome,
+                obj.categoria.nome,
+            )
+        return format_html('<strong style="color:#2d5a8e;">{}</strong>', obj.categoria.nome)
+    area_banner.short_description = 'Aparece em'
+
+    def preview_imagem(self, obj):
+        if obj.imagem:
+            return format_html(
+                '<img src="{}" style="height:40px; border-radius:4px;" />',
+                obj.imagem.url
+            )
+        return '—'
+    preview_imagem.short_description = 'Preview'
+
+
+# ── Comentários ───────────────────────────────────────────────────────
+@admin.register(Comentario)
+class ComentarioAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'conteudo_link', 'texto_resumido', 'aprovado', 'data_criacao']
+    list_filter = ['aprovado', 'data_criacao']
+    list_editable = ['aprovado']
+    search_fields = ['nome', 'email', 'texto', 'conteudo__titulo']
+    readonly_fields = ['nome', 'email', 'texto', 'conteudo', 'data_criacao']
+    ordering = ['-data_criacao']
+
+    fieldsets = (
+        ('💬 Comentário recebido', {
+            'fields': ('conteudo', 'nome', 'email', 'texto', 'data_criacao'),
+        }),
+        ('✅ Moderação', {
+            'fields': ('aprovado',),
+            'description': 'Marque "Aprovado" para publicar o comentário no site. Desmarque para ocultar.',
+        }),
+    )
+
+    def conteudo_link(self, obj):
+        return format_html(
+            '<a href="/admin/conteudo/conteudo/{}/change/" style="color:#2d5a8e;">{}</a>',
+            obj.conteudo.pk,
+            obj.conteudo.titulo[:50]
+        )
+    conteudo_link.short_description = 'Conteúdo'
+
+    def texto_resumido(self, obj):
+        return obj.texto[:80] + '…' if len(obj.texto) > 80 else obj.texto
+    texto_resumido.short_description = 'Texto'
+
+    def aprovado_badge(self, obj):
+        if obj.aprovado:
+            return format_html('<span style="color:#10b981; font-weight:700;">✓ Aprovado</span>')
+        return format_html('<span style="color:#f59e0b; font-weight:700;">⏳ Aguardando</span>')
+    aprovado_badge.short_description = 'Status'
+
+    actions = ['aprovar_selecionados', 'reprovar_selecionados']
+
+    @admin.action(description='✅ Aprovar comentários selecionados')
+    def aprovar_selecionados(self, request, queryset):
+        queryset.update(aprovado=True)
+        self.message_user(request, f'{queryset.count()} comentário(s) aprovado(s).')
+
+    @admin.action(description='❌ Reprovar / ocultar comentários selecionados')
+    def reprovar_selecionados(self, request, queryset):
+        queryset.update(aprovado=False)
+        self.message_user(request, f'{queryset.count()} comentário(s) ocultado(s).')
+
+
+# ── Configuração do site ──────────────────────────────────────────────
+@admin.register(ConfiguracaoSite)
+class ConfiguracaoSiteAdmin(admin.ModelAdmin):
+    list_display = ['nome_site', 'email_contato', 'telefone']
+
+    def has_add_permission(self, request):
+        return not ConfiguracaoSite.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
