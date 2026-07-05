@@ -294,10 +294,16 @@ class Cartaz(models.Model):
         ('esquerdo', 'Lado esquerdo'),
         ('direito', 'Lado direito'),
     ]
+    TAMANHO_CHOICES = [
+        ('pequeno', 'Pequeno (90px)'),
+        ('medio', 'Médio (140px)'),
+        ('grande', 'Grande (200px)'),
+    ]
     titulo = models.CharField('Título do evento', max_length=200)
     imagem = models.ImageField('Imagem do cartaz', upload_to='cartazes/')
     link = models.URLField('Link do evento', blank=True, help_text='URL para inscrição ou página do evento')
     lado = models.CharField('Lado da página', max_length=10, choices=LADO_CHOICES, default='esquerdo')
+    tamanho = models.CharField('Tamanho do cartaz', max_length=10, choices=TAMANHO_CHOICES, default='pequeno')
     ordem = models.PositiveIntegerField('Ordem', default=0)
     ativo = models.BooleanField('Ativo', default=True)
 

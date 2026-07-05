@@ -20,14 +20,14 @@ O dono do projeto (**Dan**) não é programador — ele trabalha na SEDU e preci
 ```
 curriculo_sedu/          # Projeto Django (settings, urls, wsgi)
 conteudo/                # App principal
-  models.py              # Categoria, Conteudo, Banner, Comentario, ConfiguracaoSite
+  models.py              # Categoria, Conteudo, Banner, Comentario, Cartaz, ConfiguracaoSite
   views.py               # home, categoria_detalhe, conteudo_detalhe, busca
   admin.py               # Admin customizado com badges, widgets visuais, moderação
   forms.py               # ConteudoAdminForm, BannerAdminForm (ligam os widgets visuais)
   widgets.py             # CategoriaPicker (grade de categorias) e IconPicker (grade de ícones)
   urls.py                # app_name='conteudo'
   context_processors.py  # site_config (config + menu_categorias global)
-  migrations/            # 0001 inicial → 0005 (icone_manual do Conteudo)
+  migrations/            # 0001 inicial → 0007 (cartaz_tamanho)
   management/commands/
     popular_categorias.py   # Seed de categorias e subcategorias
     popular_descricoes.py   # Textos introdutórios das categorias (HTML)
@@ -42,7 +42,7 @@ static/
   css/style.css          # Design system completo
   css/admin_picker.css   # Estilos dos widgets visuais do admin (CategoriaPicker, IconPicker)
   js/main.js             # Slider do hero, menu mobile
-  img/                   # brasao.png, logo-geceb.png, hero-bg.png
+  img/                   # logogov.png (Governo ES), gerenciaok.png (GECEB), hero-bg.png
 staticfiles/             # Gerado por collectstatic (produção/PythonAnywhere) — não editar
 media/                   # Uploads (banners/, destaques/) — não versionado no Git
 db.sqlite3               # Banco já populado com 102 conteúdos
@@ -61,6 +61,7 @@ db.sqlite3               # Banco já populado com 102 conteúdos
 - Campos: `titulo`, `slug`, `resumo`, `corpo` (HTML), `arquivo`, `url_video`, `url_externa`, `imagem_destaque`
 - `icone_manual` (opcional) — ícone Font Awesome escolhido no admin via grade visual (IconPicker); se vazio, usa `icone_criativo` (automático por palavra-chave)
 - `destaque` (bool) — aparece na home
+- **Agendamento**: status "Publicado" com `data_publicacao` futura — o conteúdo só aparece no site quando a data/hora chegar (via `ConteudoQuerySet.publicados()` que filtra `data_publicacao__lte=timezone.now()`)
 - Propriedades: `tipo_icone`, `icone_criativo` (prioriza `icone_manual`, senão detecta por texto), `extensao_arquivo`, `get_video_embed_url()`
 - No admin, a categoria de publicação é escolhida clicando em um botão visual (`CategoriaPicker`), não em um dropdown
 
@@ -71,8 +72,14 @@ Banners rotativos — na home (`categoria=None`) ou dentro de uma categoria espe
 
 ### Comentario
 Sistema de comentários com moderação, substituindo o Disqus do WordPress. Campos: `conteudo` (FK), `nome`, `email`, `texto`, `aprovado` (bool, padrão `False`), `data_criacao`.
-- Comentários enviados no site ficam pendentes até serem aprovados no admin (`ComentarioAdmin`, com ação em lote "Aprovar")
+- Comentários enviados no site ficam pendentes até serem aprovados no admin (`ComentarioAdmin`)
+- Ações em lote no admin: Aprovar, Reprovar/ocultar e Excluir permanentemente
 - Só comentários com `aprovado=True` aparecem na página de detalhe do conteúdo
+
+### Cartaz
+Cartazes de eventos na home. Campos: `titulo`, `imagem` (upload_to `cartazes/`), `link`, `lado` (`esquerdo`/`direito`), `tamanho` (`pequeno` 90px / `medio` 140px / `grande` 200px), `ordem`, `ativo`.
+- **Desktop (>1400px)**: posição fixa nas laterais, tamanho configurável sem distorcer imagem
+- **Mobile/Tablet (<=1400px)**: botão flutuante "Eventos" no canto inferior direito; ao clicar, abre painel deslizante de baixo para cima com grade de cartazes
 
 ### ConfiguracaoSite
 Singleton (pk=1). `nome_site`, `descricao`, `email_contato`, `telefone`, `endereco`, `logo`, `favicon`.
@@ -106,7 +113,7 @@ Variáveis principais em `style.css`:
 - `--bg: #ffffff`, `--bg-alt: #f7f8fa`
 - Font: Inter, system-ui
 
-Header: fundo `--primary`, logos 50px, nav com dropdown implícito, busca inline, largura 100% com padding 32px.
+Header: fundo `--primary`, logos 50px (`logogov.png` à esquerda, `gerenciaok.png` à direita, ambos com fundo transparente), nav com dropdown implícito, busca inline, largura 100% com padding 32px. Responsivo com breakpoints em 1024px, 768px e 400px (hamburger menu no mobile).
 
 Componentes: `.content-card`, `.category-card`, `.content-list .list-item`, `.filter-chip`, `.subcategory-chip`, `.page-intro-body` (texto introdutório com borda azul à esquerda).
 
@@ -176,7 +183,7 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Busca textual
 - [x] Migração de 102 conteúdos do site original WordPress
 - [x] 16 textos introdutórios das categorias extraídos do site original
-- [x] Header com logos (brasão ES + GECEB) sem distorção de cores
+- [x] Header com logos (`logogov.png` Governo ES + `gerenciaok.png` GECEB) com fundo transparente e tamanhos iguais
 - [x] Ícones criativos por palavra-chave (substituem a seta genérica de "link externo")
 - [x] Seletor visual de ícone por conteúdo no admin (`IconPicker`), sobrepondo o automático
 - [x] Sistema de comentários com moderação no admin (substitui o Disqus do WordPress)
@@ -184,6 +191,10 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Admin com seleção visual de categoria/área (`CategoriaPicker`), tanto para Conteúdo quanto para Banner
 - [x] Banners rotativos por área (home ou categoria específica), com imagem nunca cortada/distorcida e tamanho configurável (pequeno/médio/grande)
 - [x] Deploy de teste em produção no PythonAnywhere (https://rabalista.pythonanywhere.com)
+- [x] Agendamento de publicação por data/hora futura (conteúdo fica invisível até a data chegar)
+- [x] Cartazes laterais de eventos na home (posição fixa, configurável por lado esquerdo/direito)
+- [x] Responsividade completa para celulares e tablets (breakpoints 1024px, 768px, 400px)
+- [x] Exclusão de comentários no admin (ação em lote + botão individual)
 
 ## O que falta / próximos passos possíveis
 
@@ -192,7 +203,6 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [ ] Migrar para domínio oficial `curriculo.sedu.es.gov.br` + certificado SSL
 - [ ] Deploy final com Docker + PostgreSQL para produção definitiva
 - [ ] Testar em Windows (ambiente de trabalho do Dan)
-- [ ] Melhorar responsividade mobile
 - [ ] Adicionar paginação nas listagens de conteúdo
 
 ## Notas importantes

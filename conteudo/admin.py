@@ -257,7 +257,7 @@ class ComentarioAdmin(admin.ModelAdmin):
         return format_html('<span style="color:#f59e0b; font-weight:700;">⏳ Aguardando</span>')
     aprovado_badge.short_description = 'Status'
 
-    actions = ['aprovar_selecionados', 'reprovar_selecionados']
+    actions = ['aprovar_selecionados', 'reprovar_selecionados', 'excluir_selecionados']
 
     @admin.action(description='✅ Aprovar comentários selecionados')
     def aprovar_selecionados(self, request, queryset):
@@ -268,6 +268,12 @@ class ComentarioAdmin(admin.ModelAdmin):
     def reprovar_selecionados(self, request, queryset):
         queryset.update(aprovado=False)
         self.message_user(request, f'{queryset.count()} comentário(s) ocultado(s).')
+
+    @admin.action(description='🗑️ Excluir comentários selecionados')
+    def excluir_selecionados(self, request, queryset):
+        count = queryset.count()
+        queryset.delete()
+        self.message_user(request, f'{count} comentário(s) excluído(s) permanentemente.')
 
 
 # ── Cartazes ─────────────────────────────────────────────────────────
@@ -286,8 +292,8 @@ class CartazAdmin(admin.ModelAdmin):
             ),
         }),
         ('⚙️ Posição e exibição', {
-            'fields': ('lado', 'ordem', 'ativo'),
-            'description': 'Escolha em qual lado da página o cartaz vai aparecer.',
+            'fields': ('lado', 'tamanho', 'ordem', 'ativo'),
+            'description': 'Escolha em qual lado da página o cartaz vai aparecer e o tamanho desejado.',
         }),
     )
 
