@@ -32,6 +32,7 @@ conteudo/                # App principal
     popular_categorias.py   # Seed de categorias e subcategorias
     popular_descricoes.py   # Textos introdutórios das categorias (HTML)
     migrar_conteudo.py      # 102 itens de conteúdo migrados do WordPress
+    migrar_orientacoes.py   # 129 documentos de Orientações Curriculares do WordPress
 templates/
   base.html              # Layout base (header, nav dinâmica, footer, ícone discreto de admin)
   home.html              # Home: hero/banners, "Conteúdos recentes" (esquerda) + "Navegue por área" (direita)
@@ -41,11 +42,11 @@ templates/
 static/
   css/style.css          # Design system completo
   css/admin_picker.css   # Estilos dos widgets visuais do admin (CategoriaPicker, IconPicker)
-  js/main.js             # Slider do hero, menu mobile
+  js/main.js             # Slider do hero, menu mobile, posicionamento dinâmico dos cartazes
   img/                   # logogov.png (Governo ES), gerenciaok.png (GECEB), hero-bg.png
 staticfiles/             # Gerado por collectstatic (produção/PythonAnywhere) — não editar
 media/                   # Uploads (banners/, destaques/) — não versionado no Git
-db.sqlite3               # Banco já populado com 102 conteúdos
+db.sqlite3               # Banco já populado com 231+ conteúdos (102 originais + 129 orientações)
 ```
 
 ## Modelos principais
@@ -98,14 +99,15 @@ Singleton (pk=1). `nome_site`, `descricao`, `email_contato`, `telefone`, `endere
 /conteudo/<slug>/          → detalhe de conteúdo
 ```
 
-## Categorias atuais (6 principais + subcategorias)
+## Categorias atuais (7 principais + subcategorias)
 
 1. **Documentos Curriculares** (fas fa-book) — subcategorias: Currículo Atual, Orientações Curriculares, Cadernos Metodológicos, Mapas de Progressão, Ementas Curriculares, Rotinas de Recomposição, Espaços Potencialmente Educativos
-2. **Programas** (fas fa-project-diagram) — subcategorias: Educar para a Paz, Mais Leitores, Educação Ambiental, Sucesso Escolar
-3. **Livro Didático** (fas fa-book-reader)
-4. **Modalidades e Diversidade** (fas fa-users) — subcategorias: EJA — Documentos, Educação do Campo, Educação Quilombola, Educação Indígena, Relações Étnico-Raciais, Socioeducação
-5. **Olimpíadas e Competições** (fas fa-trophy)
-6. **Institucional** (fas fa-landmark)
+2. **Orientações Curriculares** (fas fa-compass) — 129 documentos migrados do WordPress, 16 subcategorias: EF Anos Iniciais, EF Anos Finais, EM Formação Geral Básica, 3 grupos IFA, 9 Itinerários, Anos Anteriores
+3. **Programas** (fas fa-project-diagram) — subcategorias: Educar para a Paz, Mais Leitores, Educação Ambiental, Sucesso Escolar
+4. **Livro Didático** (fas fa-book-reader)
+5. **Modalidades e Diversidade** (fas fa-users) — subcategorias: EJA — Documentos, Educação do Campo, Educação Quilombola, Educação Indígena, Relações Étnico-Raciais, Socioeducação
+6. **Olimpíadas e Competições** (fas fa-trophy)
+7. **Institucional** (fas fa-landmark)
 
 ## Design system (CSS)
 
@@ -170,6 +172,7 @@ Admin: http://127.0.0.1:8000/admin/ (criar superuser com `python manage.py creat
 python manage.py popular_categorias    # Cria categorias e subcategorias
 python manage.py popular_descricoes    # Textos introdutórios das categorias
 python manage.py migrar_conteudo       # 102 itens de conteúdo do site original
+python manage.py migrar_orientacoes    # 129 documentos de Orientações Curriculares
 ```
 
 Todos são idempotentes (usam `get_or_create` ou verificam existência).
@@ -198,12 +201,14 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Cartazes de eventos na home com tamanho configurável (pequeno/médio/grande) — desktop mostra nas laterais, mobile/tablet via botão flutuante
 - [x] Responsividade completa para celulares e tablets (breakpoints 1024px, 768px, 400px)
 - [x] Exclusão de comentários no admin (ação em lote + botão individual)
-- [x] Cartazes laterais limitados à área entre header e footer (nunca ultrapassam as margens azuis, mesmo em telas curtas)
+- [x] Cartazes laterais limitados à área branca de conteúdo (JavaScript dinâmico mede header+banner+intro e footer a cada scroll)
 - [x] Texto da home ("Currículo do Espírito Santo — Referencial...") movido para abaixo do banner/hero e editável no admin com formatação (negrito, itálico, alinhamento, lista)
 - [x] Ordem mobile corrigida: "Conteúdos recentes" aparece antes de "Navegue por área" (estava invertido)
 - [x] Menu mobile (hamburger) corrigido — os itens do menu apareciam cortados na lateral direita por um bug de `flex-basis` no CSS
 - [x] Seletor visual de ícone (`IconPicker`) também no admin de Categoria, não só em Conteúdo
 - [x] Primeira leva de conteúdos "link" que ainda apontavam para páginas de texto do WordPress antigo convertidos em páginas nativas (`tipo='pagina'`) com comentários moderados no admin Django — trabalho de migrar os ~41 itens restantes está registrado como tarefa separada (ver nota abaixo)
+- [x] Categoria "Orientações Curriculares" com 129 documentos migrados do WordPress (16 subcategorias: EF Anos Iniciais/Finais, EM Formação Geral Básica, IFAs, Itinerários, Anos anteriores) — comando `migrar_orientacoes.py`
+- [x] Cartazes laterais com posicionamento dinâmico via JavaScript — medem em tempo real onde começa e termina a área branca (entre header/banner/texto azul e footer) e se reposicionam a cada scroll, nunca invadindo as faixas azuis
 
 ## O que falta / próximos passos possíveis
 
