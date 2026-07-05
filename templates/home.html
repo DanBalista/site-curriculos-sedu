@@ -22,13 +22,19 @@
     <div class="hero-default">
         <img src="{% static 'img/hero-bg.png' %}"
              alt="" class="hero-illustration">
-        <div class="hero-content">
-            <h1>Currículo do Espírito Santo</h1>
-            <p>Referencial curricular da Educação Básica, elaborado em regime de colaboração entre Estado e municípios.</p>
-        </div>
     </div>
     {% endif %}
 </section>
+
+<!-- ── Texto da home (editável no admin, abaixo do banner) ─────── -->
+{% if config.home_titulo or config.home_texto %}
+<section class="home-intro">
+    <div class="container">
+        {% if config.home_titulo %}<h1>{{ config.home_titulo }}</h1>{% endif %}
+        {% if config.home_texto %}<div class="home-intro-texto">{{ config.home_texto|safe }}</div>{% endif %}
+    </div>
+</section>
+{% endif %}
 
 <!-- ── Destaques ──────────────────────────────────────────────── -->
 {% if destaques %}

@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from django.utils import timezone
 from django.db.models import Count
 from .models import Categoria, Conteudo, Banner, ConfiguracaoSite, Comentario, Cartaz
-from .forms import BannerAdminForm, ConteudoAdminForm
+from .forms import BannerAdminForm, ConteudoAdminForm, CategoriaAdminForm, ConfiguracaoSiteAdminForm
 
 
 # ── Customização global do Admin ──────────────────────────────────────
@@ -15,6 +15,7 @@ admin.site.index_title = 'Gerenciar conteúdo do site'
 # ── Categoria ─────────────────────────────────────────────────────────
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
+    form = CategoriaAdminForm
     list_display = ['nome', 'categoria_pai', 'ordem', 'ativa', 'total_conteudos']
     list_filter = ['ativa', 'categoria_pai']
     list_editable = ['ordem', 'ativa']
@@ -23,11 +24,17 @@ class CategoriaAdmin(admin.ModelAdmin):
 
     fieldsets = (
         (None, {
-            'fields': ('nome', 'slug', 'descricao', 'categoria_pai')
+            'fields': ('nome', 'slug', 'descricao', 'categoria_pai'),
+            'description': (
+                'Dica: se o campo "URL amigável" aparecer preenchido sozinho com um '
+                'endereço estranho ao criar uma categoria nova, é uma sugestão de '
+                'preenchimento automático do navegador (não é um erro do site) — '
+                'basta apagar e digitar o texto correto, ou deixar em branco que o '
+                'sistema preenche automaticamente a partir do nome.'
+            ),
         }),
         ('Aparência', {
             'fields': ('icone', 'imagem', 'ordem', 'ativa'),
-            'classes': ('collapse',),
         }),
     )
 
@@ -321,7 +328,24 @@ class CartazAdmin(admin.ModelAdmin):
 # ── Configuração do site ──────────────────────────────────────────────
 @admin.register(ConfiguracaoSite)
 class ConfiguracaoSiteAdmin(admin.ModelAdmin):
+    form = ConfiguracaoSiteAdminForm
     list_display = ['nome_site', 'email_contato', 'telefone']
+
+    fieldsets = (
+        ('📝 Texto da página inicial', {
+            'fields': ('home_titulo', 'home_texto'),
+            'description': (
+                'Este é o título e o texto que aparecem na home, logo abaixo do banner. '
+                'Use a barra de ferramentas para negrito, itálico, sublinhado e alinhamento.'
+            ),
+        }),
+        ('🏢 Dados institucionais', {
+            'fields': ('nome_site', 'descricao', 'email_contato', 'telefone', 'endereco'),
+        }),
+        ('🖼️ Identidade visual', {
+            'fields': ('logo', 'favicon'),
+        }),
+    )
 
     def has_add_permission(self, request):
         return not ConfiguracaoSite.objects.exists()

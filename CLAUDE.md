@@ -23,11 +23,11 @@ conteudo/                # App principal
   models.py              # Categoria, Conteudo, Banner, Comentario, Cartaz, ConfiguracaoSite
   views.py               # home, categoria_detalhe, conteudo_detalhe, busca
   admin.py               # Admin customizado com badges, widgets visuais, moderação
-  forms.py               # ConteudoAdminForm, BannerAdminForm (ligam os widgets visuais)
-  widgets.py             # CategoriaPicker (grade de categorias) e IconPicker (grade de ícones)
+  forms.py               # ConteudoAdminForm, BannerAdminForm, CategoriaAdminForm, ConfiguracaoSiteAdminForm
+  widgets.py             # CategoriaPicker, IconPicker (grade de ícones) e RichTextWidget (editor com formatação)
   urls.py                # app_name='conteudo'
   context_processors.py  # site_config (config + menu_categorias global)
-  migrations/            # 0001 inicial → 0007 (cartaz_tamanho)
+  migrations/            # 0001 inicial → 0008 (config_home_texto)
   management/commands/
     popular_categorias.py   # Seed de categorias e subcategorias
     popular_descricoes.py   # Textos introdutórios das categorias (HTML)
@@ -54,6 +54,8 @@ db.sqlite3               # Banco já populado com 102 conteúdos
 - `nome`, `slug`, `descricao` (HTML para textos introdutórios), `icone` (classe Font Awesome)
 - `categoria_pai` (FK self) — hierarquia de 2 níveis
 - `ordem`, `ativa`, `imagem`
+- No admin, o campo `icone` usa a mesma grade visual (`IconPicker`) do Conteúdo
+- O campo `slug` tem `autocomplete="off"` porque o navegador às vezes sugere preencher automaticamente com um valor salvo do histórico (não é um erro do site — se aparecer algo estranho no campo "URL amigável" ao criar uma categoria nova, é só apagar e digitar o correto)
 
 ### Conteudo
 - Tipos: `documento`, `video`, `post`, `link`, `pagina`
@@ -83,6 +85,7 @@ Cartazes de eventos na home. Campos: `titulo`, `imagem` (upload_to `cartazes/`),
 
 ### ConfiguracaoSite
 Singleton (pk=1). `nome_site`, `descricao`, `email_contato`, `telefone`, `endereco`, `logo`, `favicon`.
+- `home_titulo` e `home_texto` — título e texto que aparecem na home, logo abaixo do banner/hero. Editáveis no admin em "Configuração do site" → seção "📝 Texto da página inicial", com um editor de texto simples (`RichTextWidget`) com negrito, itálico, sublinhado, alinhamento e lista — sem depender de bibliotecas externas (usa `contenteditable` + `document.execCommand`, salva HTML no campo).
 
 ## URLs
 
@@ -195,9 +198,16 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Cartazes de eventos na home com tamanho configurável (pequeno/médio/grande) — desktop mostra nas laterais, mobile/tablet via botão flutuante
 - [x] Responsividade completa para celulares e tablets (breakpoints 1024px, 768px, 400px)
 - [x] Exclusão de comentários no admin (ação em lote + botão individual)
+- [x] Cartazes laterais limitados à área entre header e footer (nunca ultrapassam as margens azuis, mesmo em telas curtas)
+- [x] Texto da home ("Currículo do Espírito Santo — Referencial...") movido para abaixo do banner/hero e editável no admin com formatação (negrito, itálico, alinhamento, lista)
+- [x] Ordem mobile corrigida: "Conteúdos recentes" aparece antes de "Navegue por área" (estava invertido)
+- [x] Menu mobile (hamburger) corrigido — os itens do menu apareciam cortados na lateral direita por um bug de `flex-basis` no CSS
+- [x] Seletor visual de ícone (`IconPicker`) também no admin de Categoria, não só em Conteúdo
+- [x] Primeira leva de conteúdos "link" que ainda apontavam para páginas de texto do WordPress antigo convertidos em páginas nativas (`tipo='pagina'`) com comentários moderados no admin Django — trabalho de migrar os ~41 itens restantes está registrado como tarefa separada (ver nota abaixo)
 
 ## O que falta / próximos passos possíveis
 
+- [ ] **Migrar as ~41 páginas restantes que ainda apontam para o WordPress antigo** (lista e instruções na tarefa em segundo plano "Migrar 41 páginas do WordPress para páginas nativas" criada em 2026-07-05) — enquanto isso não for feito, o clique nesses cards ainda abre o site WordPress antigo e os comentários lá continuam fora do controle do admin novo
 - [ ] Adicionar imagens de destaque aos demais conteúdos
 - [ ] Refinamentos visuais conforme feedback do Dan e aprovação do chefe
 - [ ] Migrar para domínio oficial `curriculo.sedu.es.gov.br` + certificado SSL
@@ -213,4 +223,6 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - O usuário não tem conhecimento de programação — sempre forneça comandos prontos para copiar e colar.
 - Widgets visuais do admin (`CategoriaPicker`, `IconPicker`) carregam o Font Awesome via CDN na própria `Media` da classe, pois o admin do Django não inclui o CDN usado no site público (`templates/base.html`).
 - O CSS dos widgets (`admin_picker.css`) usa `!important` em vários pontos porque o CSS padrão do Django Admin estiliza `<label>` genericamente (largura fixa, `display: block`), o que sobrescreveria a grade de botões sem isso.
-- **Cartazes**: no admin, ao criar/editar um cartaz, escolha o tamanho na seção "Posição e exibição" — a imagem nunca será distorcida (usa `object-fit: contain`). Em desktop (>1400px), aparecem fixos nas laterais; em mobile/tablet (≤1400px), um botão flutuante "Eventos" abre um painel deslizante com todos os cartazes ativos em grade. O botão só aparece se houver pelo menos um cartaz com "Ativo" marcado.
+- **Cartazes**: no admin, ao criar/editar um cartaz, escolha o tamanho na seção "Posição e exibição" — a imagem nunca será distorcida (usa `object-fit: contain`). Em desktop (>1400px), aparecem fixos nas laterais, limitados entre 100px do topo e 100px da base da tela (nunca invadem o header/footer); em mobile/tablet (≤1400px), um botão flutuante "Eventos" abre um painel deslizante com todos os cartazes ativos em grade. O botão só aparece se houver pelo menos um cartaz com "Ativo" marcado.
+- **Cache do navegador ao testar mudanças de CSS**: depois de publicar uma alteração visual (deploy no PythonAnywhere ou até localmente), se a mudança não aparecer, force um recarregamento sem cache (Ctrl+Shift+R no Windows/Linux, Cmd+Shift+R no Mac) antes de concluir que há um bug — várias vezes durante o desenvolvimento o código já estava correto mas o navegador ainda mostrava o CSS antigo salvo em cache.
+- **Fluxo de trabalho obrigatório**: toda alteração de código feita nesta pasta local também precisa ser enviada ao GitHub (`git add`, `git commit`, `git push origin main`) para não ficar dessincronizada — o site publicado no PythonAnywhere só recebe as mudanças fazendo `git pull` de lá. Sempre que uma sessão terminar com alterações no código, confirme que o `git push` foi feito.

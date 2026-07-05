@@ -320,6 +320,14 @@ class ConfiguracaoSite(models.Model):
     """Configurações gerais do site (singleton)"""
     nome_site = models.CharField('Nome do site', max_length=200, default='Currículo do Espírito Santo')
     descricao = models.TextField('Descrição', default='Currículo da Educação Básica do Espírito Santo')
+    home_titulo = models.CharField(
+        'Título da página inicial', max_length=200,
+        default='Currículo do Espírito Santo'
+    )
+    home_texto = models.TextField(
+        'Texto da página inicial', blank=True,
+        default='<p>Referencial curricular da Educação Básica, elaborado em regime de colaboração entre Estado e municípios.</p>'
+    )
     email_contato = models.EmailField('E-mail de contato', default='gerenciadecurriculo@sedu.es.gov.br')
     telefone = models.CharField('Telefone', max_length=50, default='(27) 3636-7838 / 7842')
     endereco = models.TextField(
