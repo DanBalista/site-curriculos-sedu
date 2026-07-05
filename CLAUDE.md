@@ -208,7 +208,7 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Seletor visual de ícone (`IconPicker`) também no admin de Categoria, não só em Conteúdo
 - [x] Primeira leva de conteúdos "link" que ainda apontavam para páginas de texto do WordPress antigo convertidos em páginas nativas (`tipo='pagina'`) com comentários moderados no admin Django — trabalho de migrar os ~41 itens restantes está registrado como tarefa separada (ver nota abaixo)
 - [x] Categoria "Orientações Curriculares" com 129 documentos migrados do WordPress (16 subcategorias: EF Anos Iniciais/Finais, EM Formação Geral Básica, IFAs, Itinerários, Anos anteriores) — comando `migrar_orientacoes.py`
-- [x] Cartazes laterais com posicionamento dinâmico via JavaScript — medem em tempo real onde começa e termina a área branca (entre header/banner/texto azul e footer) e se reposicionam a cada scroll, nunca invadindo as faixas azuis
+- [x] Cartazes laterais com posicionamento dinâmico via JavaScript — medem em tempo real onde começa e termina a área branca (entre header/banner/texto azul e footer) e se reposicionam a cada scroll, nunca invadindo as faixas azuis; o JS fixa o topo E a base da caixa (não só o topo) para que o cartaz fique centralizado dentro da área branca disponível, em vez de colado no topo
 - [x] Nova ilustração do banner da home (`hero-ilustracao.png`) preenchendo o quadrante inteiro do banner (`object-fit: cover`, sem opacidade reduzida); quadro do texto "Currículo do Espírito Santo" abaixo do banner reduzido (fonte e padding menores) para que o banner de imagem fique visualmente maior que o quadro de texto
 
 ## O que falta / próximos passos possíveis
