@@ -148,6 +148,13 @@ class Conteudo(models.Model):
         help_text='Imagem exibida no card e no topo da página'
     )
 
+    # Ícone escolhido manualmente (opcional) — sobrepõe o ícone automático
+    icone_manual = models.CharField(
+        'Ícone do card', max_length=50, blank=True,
+        help_text='Deixe em branco para o site escolher um ícone automaticamente '
+                  'com base no título e na categoria.'
+    )
+
     # Publicação
     status = models.CharField(
         'Status', max_length=20,
@@ -198,8 +205,11 @@ class Conteudo(models.Model):
 
     @property
     def icone_criativo(self):
-        """Ícone contextual escolhido pelo texto do título/categoria.
-        Substitui a seta genérica de 'link externo' por algo temático."""
+        """Ícone exibido no card. Usa o ícone escolhido manualmente no admin,
+        se houver; caso contrário, escolhe automaticamente pelo texto do
+        título/categoria, substituindo a seta genérica de 'link externo'."""
+        if self.icone_manual:
+            return self.icone_manual
         texto = self.titulo or ''
         if self.categoria:
             texto += ' ' + (self.categoria.nome or '')

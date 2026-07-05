@@ -42,9 +42,11 @@
     gap: 8px;
 }
 
-/* Cada botão */
+/* Cada botão — !important pois o Django Admin aplica estilo de <label>
+   (largura fixa, float, display:block) que sobrescreveria nossa grade. */
 .cp-btn {
-    display: flex;
+    display: flex !important;
+    float: none !important;
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
@@ -53,8 +55,10 @@
     border-radius: 8px;
     cursor: pointer;
     transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
-    min-width: 190px;
-    max-width: 260px;
+    min-width: 190px !important;
+    max-width: 260px !important;
+    width: auto !important;
+    box-sizing: border-box !important;
     user-select: none;
 }
 .cp-btn:hover {
@@ -116,4 +120,19 @@
 /* Responsivo */
 @media (max-width: 800px) {
     .cp-btn { min-width: 140px; }
+}
+
+/* Botão de ícone (IconPicker) — quadrado, sem texto ao lado */
+.cp-btn-icon {
+    min-width: 0 !important;
+    max-width: none !important;
+    width: 44px !important;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+}
+.cp-btn-icon .cp-icon {
+    width: 100%;
+    height: 100%;
+    font-size: 16px;
 }

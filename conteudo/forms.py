@@ -1,6 +1,6 @@
 from django import forms
 from .models import Banner, Conteudo
-from .widgets import CategoriaPicker
+from .widgets import CategoriaPicker, IconPicker
 
 
 class BannerAdminForm(forms.ModelForm):
@@ -18,4 +18,5 @@ class ConteudoAdminForm(forms.ModelForm):
         fields = '__all__'
         widgets = {
             'categoria': CategoriaPicker(include_home=False),
+            'icone_manual': IconPicker(),
         }

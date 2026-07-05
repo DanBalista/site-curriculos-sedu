@@ -72,6 +72,14 @@ class ConteudoAdmin(admin.ModelAdmin):
             ),
             'classes': ('collapse',),
         }),
+        ('🎨 Ícone do card', {
+            'fields': ('icone_manual',),
+            'description': (
+                'Aparece no card quando não há "Imagem de destaque". '
+                'Escolha "Automático" para o site decidir sozinho, ou clique em um '
+                'ícone específico para usar sempre esse.'
+            ),
+        }),
         ('⚙️ Publicação', {
             'fields': ('status', 'destaque', 'ordem', 'autor', 'data_publicacao'),
             'description': 'Status "Publicado" torna o conteúdo visível no site. "Destaque" aparece na home.',
