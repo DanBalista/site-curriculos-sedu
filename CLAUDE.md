@@ -36,6 +36,7 @@ conteudo/                # App principal
     migrar_ifa.py           # Itinerários Formativos de Aprofundamento (IFA): 10 subcategorias, 14 docs
     organizar_curriculo_atual.py  # Divide "Currículo Atual" em sub-botões por etapa de ensino
     migrar_material_apoio.py      # Subcategoria "Material de Apoio" dentro de Currículo Atual (5 docs)
+    migrar_projetos_integradores.py  # Categoria principal "Projetos Integradores" (5 subcategorias)
 templates/
   base.html              # Layout base (header, nav dinâmica, footer, ícone discreto de admin)
   home.html              # Home: hero/banners, "Conteúdos recentes" (esquerda) + "Navegue por área" (direita)
@@ -102,15 +103,17 @@ Singleton (pk=1). `nome_site`, `descricao`, `email_contato`, `telefone`, `endere
 /conteudo/<slug>/          → detalhe de conteúdo
 ```
 
-## Categorias atuais (7 principais + subcategorias)
+## Categorias atuais (9 principais + subcategorias)
 
-1. **Documentos Curriculares** (fas fa-book) — subcategorias: Currículo Atual, Orientações Curriculares, Cadernos Metodológicos, Mapas de Progressão, Ementas Curriculares, Rotinas de Recomposição, Espaços Potencialmente Educativos
+1. **Documentos Curriculares** (fas fa-book) — subcategorias: Currículo Atual (com 5 sub-botões por etapa: Educação Infantil, EF Anos Iniciais, EF Anos Finais, Ensino Médio, Material de Apoio), Orientações Curriculares, Cadernos Metodológicos, Mapas de Progressão, Ementas Curriculares, Rotinas de Recomposição, Espaços Potencialmente Educativos
 2. **Orientações Curriculares** (fas fa-compass) — 129 documentos migrados do WordPress, 16 subcategorias: EF Anos Iniciais, EF Anos Finais, EM Formação Geral Básica, 3 grupos IFA, 9 Itinerários, Anos Anteriores
-3. **Programas** (fas fa-project-diagram) — subcategorias: Educar para a Paz, Mais Leitores, Educação Ambiental, Sucesso Escolar
-4. **Livro Didático** (fas fa-book-reader)
-5. **Modalidades e Diversidade** (fas fa-users) — subcategorias: EJA — Documentos, Educação do Campo, Educação Quilombola, Educação Indígena, Relações Étnico-Raciais, Socioeducação
-6. **Olimpíadas e Competições** (fas fa-trophy)
-7. **Institucional** (fas fa-landmark)
+3. **Itinerários Formativos de Aprofundamento (IFA)** (fas fa-route) — 10 subcategorias, 14 documentos
+4. **Projetos Integradores** (fas fa-diagram-project) — 5 subcategorias (Documentos Gerais, Linguagens e Ciências Humanas 2ªDiurno, Ciências da Natureza e Matemática 2ªDiurno, Linguagens 1ªNoturno, CHSA 2ªNoturno)
+5. **Programas** (fas fa-project-diagram) — subcategorias: Educar para a Paz, Mais Leitores, Educação Ambiental, Sucesso Escolar
+6. **Livro Didático** (fas fa-book-reader)
+7. **Modalidades e Diversidade** (fas fa-users) — subcategorias: EJA — Documentos, Educação do Campo, Educação Quilombola, Educação Indígena, Relações Étnico-Raciais, Socioeducação
+8. **Olimpíadas e Competições** (fas fa-trophy)
+9. **Institucional** (fas fa-landmark)
 
 ## Design system (CSS)
 
@@ -179,6 +182,7 @@ python manage.py migrar_orientacoes    # 129 documentos de Orientações Curricu
 python manage.py migrar_ifa            # Itinerários Formativos de Aprofundamento (IFA)
 python manage.py organizar_curriculo_atual  # Sub-botões por etapa em "Currículo Atual"
 python manage.py migrar_material_apoio      # Subcategoria "Material de Apoio" em Currículo Atual
+python manage.py migrar_projetos_integradores  # Categoria "Projetos Integradores" (Navegue por área)
 ```
 
 Todos são idempotentes (usam `get_or_create` ou verificam existência). Os comandos
@@ -219,6 +223,7 @@ de duplicar. Usam slugs FIXOS para nunca criar subcategorias duplicadas.
 - [x] Categoria "Orientações Curriculares" com 129 documentos migrados do WordPress (16 subcategorias: EF Anos Iniciais/Finais, EM Formação Geral Básica, IFAs, Itinerários, Anos anteriores) — comando `migrar_orientacoes.py`
 - [x] Categoria principal "Itinerários Formativos de Aprofundamento (IFA)" (Navegue por área) com 10 subcategorias e 14 documentos — comando `migrar_ifa.py` (move docs existentes ou cria; slugs fixos; remove subcategorias vazias)
 - [x] "Currículo Atual" (dentro de Documentos Curriculares) dividido em sub-botões por etapa de ensino (Educação Infantil, EF Anos Iniciais, EF Anos Finais, Ensino Médio, Material de Apoio), como os acordeões do site antigo — comandos `organizar_curriculo_atual.py` e `migrar_material_apoio.py`. Resoluções e Tema Integrador ficam como documentos gerais direto em "Currículo Atual"
+- [x] Categoria principal "Projetos Integradores" (Navegue por área, logo após IFA) com texto introdutório e 5 subcategorias, migrado de `curriculo.sedu.es.gov.br/curriculo/projetointegrador/` — comando `migrar_projetos_integradores.py`. Os 3 documentos gerais dos IFAs que também aparecem nessa página do WordPress NÃO foram duplicados aqui — permanecem só em "Itinerários Formativos de Aprofundamento (IFA)"
 - [x] Menu do topo corrigido: em telas ≤1400px os ícones dos links de navegação são ocultados para os textos das categorias não ficarem cortados
 - [x] Cartazes laterais presos à área branca via CSS puro (`position: sticky`) — os cartazes agora são filhos da seção branca de conteúdo (`.home-conteudo`, `position: relative`); cada coluna é `position: absolute` presa ao topo e à base dessa seção e o bloco interno (`.cartazes-inner`) usa `position: sticky; top: 88px` para acompanhar a rolagem. Como são filhos da área branca, é fisicamente impossível invadirem o banner/faixa azul (acima) ou o rodapé (abaixo). Substituiu a abordagem anterior por JavaScript, que era frágil
 - [x] Nova ilustração do banner da home (`hero-ilustracao.png`) preenchendo o quadrante inteiro do banner (`object-fit: cover`, sem opacidade reduzida); quadro do texto "Currículo do Espírito Santo" abaixo do banner reduzido (fonte e padding menores) para que o banner de imagem fique visualmente maior que o quadro de texto
