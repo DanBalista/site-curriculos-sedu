@@ -234,10 +234,19 @@ class Conteudo(models.Model):
 
 class Banner(models.Model):
     """Banners rotativos — aparecem na home ou em uma categoria específica."""
+    TAMANHO_CHOICES = [
+        ('pequeno', 'Pequeno'),
+        ('medio', 'Médio (padrão)'),
+        ('grande', 'Grande'),
+    ]
     titulo = models.CharField('Título', max_length=200)
     subtitulo = models.CharField('Subtítulo', max_length=300, blank=True)
     imagem = models.ImageField('Imagem do banner', upload_to='banners/')
     link = models.URLField('Link ao clicar', blank=True)
+    tamanho = models.CharField(
+        'Tamanho da imagem', max_length=10, choices=TAMANHO_CHOICES, default='medio',
+        help_text='Controla a altura máxima do banner. A imagem nunca é cortada ou distorcida.'
+    )
     ordem = models.PositiveIntegerField('Ordem', default=0)
     ativo = models.BooleanField('Ativo', default=True)
     categoria = models.ForeignKey(

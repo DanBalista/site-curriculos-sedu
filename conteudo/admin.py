@@ -159,8 +159,12 @@ class BannerAdmin(admin.ModelAdmin):
             'fields': ('titulo', 'subtitulo', 'link'),
         }),
         ('🖼️ Imagem', {
-            'fields': ('imagem',),
-            'description': 'Recomendado: imagem horizontal (1200×400px ou similar).',
+            'fields': ('imagem', 'tamanho'),
+            'description': (
+                'Qualquer formato de imagem funciona (horizontal ou vertical) — '
+                'ela nunca será cortada ou distorcida. Use "Tamanho" para controlar '
+                'a altura do banner na página.'
+            ),
         }),
         ('⚙️ Exibição', {
             'fields': ('ordem', 'ativo'),

@@ -8,7 +8,7 @@
     {% if banners %}
     <div class="hero-slider" id="heroSlider">
         {% for banner in banners %}
-        <div class="hero-slide {% if forloop.first %}active{% endif %}">
+        <div class="hero-slide tamanho-{{ banner.tamanho }} {% if forloop.first %}active{% endif %}" style="background-image:url('{{ banner.imagem.url }}')">
             <img src="{{ banner.imagem.url }}" alt="{{ banner.titulo }}">
             <div class="hero-overlay">
                 <h1>{{ banner.titulo }}</h1>
