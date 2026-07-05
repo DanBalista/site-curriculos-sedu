@@ -66,7 +66,33 @@
 {% endif %}
 
 <!-- ── Recentes (esquerda) + Navegue por área (direita) ───────── -->
-<section class="section">
+<section class="section home-conteudo">
+
+    <!-- Cartazes laterais (desktop): presos DENTRO da área branca (sticky) -->
+    {% if cartazes_esq %}
+    <div class="cartazes-lateral cartazes-esq">
+        <div class="cartazes-inner">
+            {% for c in cartazes_esq %}
+            <a href="{{ c.link }}" class="cartaz-item cartaz-{{ c.tamanho }}" target="_blank" rel="noopener" title="{{ c.titulo }}">
+                <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if cartazes_dir %}
+    <div class="cartazes-lateral cartazes-dir">
+        <div class="cartazes-inner">
+            {% for c in cartazes_dir %}
+            <a href="{{ c.link }}" class="cartaz-item cartaz-{{ c.tamanho }}" target="_blank" rel="noopener" title="{{ c.titulo }}">
+                <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
     <div class="container">
         <div class="home-split">
 
@@ -122,29 +148,8 @@
     </div>
 </section>
 
-<!-- ── Cartazes laterais (eventos) ─────────────────────────────── -->
+<!-- ── Cartazes de eventos: botão flutuante + painel (mobile/tablet) ─ -->
 {% if cartazes_esq or cartazes_dir %}
-<!-- Cartazes laterais (desktop: fixos nas laterais) -->
-{% if cartazes_esq %}
-<div class="cartazes-lateral cartazes-esq">
-    {% for c in cartazes_esq %}
-    <a href="{{ c.link }}" class="cartaz-item cartaz-{{ c.tamanho }}" target="_blank" rel="noopener" title="{{ c.titulo }}">
-        <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
-    </a>
-    {% endfor %}
-</div>
-{% endif %}
-
-{% if cartazes_dir %}
-<div class="cartazes-lateral cartazes-dir">
-    {% for c in cartazes_dir %}
-    <a href="{{ c.link }}" class="cartaz-item cartaz-{{ c.tamanho }}" target="_blank" rel="noopener" title="{{ c.titulo }}">
-        <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
-    </a>
-    {% endfor %}
-</div>
-{% endif %}
-
 <!-- Cartazes mobile/tablet: botão + painel -->
 <button class="cartazes-mobile-btn" onclick="document.getElementById('cartazesPainel').classList.toggle('aberto')" aria-label="Ver eventos">
     <i class="fas fa-calendar-star"></i>

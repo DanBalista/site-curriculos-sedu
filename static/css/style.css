@@ -954,20 +954,30 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 /* ── Cartazes laterais (eventos) ───────────────────────────────── */
+/* A seção branca de conteúdo é o "trilho" dos cartazes. Como eles são
+   filhos dela (position: absolute preso ao topo e à base da seção),
+   NUNCA conseguem invadir o banner/faixa azul acima nem o rodapé abaixo.
+   O bloco interno usa position: sticky para acompanhar a rolagem,
+   mas sempre confinado dentro desse trilho branco. */
+.home-conteudo { position: relative; }
+
 .cartazes-lateral {
-    position: fixed;
-    top: 100px;
-    bottom: 100px;
-    z-index: 90;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 20;
 }
 .cartazes-esq { left: 8px; }
 .cartazes-dir { right: 8px; }
+
+.cartazes-inner {
+    position: sticky;
+    top: 88px;            /* logo abaixo do cabeçalho fixo */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
 
 .cartaz-item {
     display: block;
