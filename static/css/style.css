@@ -189,15 +189,16 @@ img { max-width: 100%; height: auto; display: block; }
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 140px;
+    min-height: 340px;
 }
 .hero-illustration {
     position: absolute;
-    top: 50%;
-    left: 0;
+    inset: 0;
     width: 100%;
-    transform: translateY(-50%);
-    opacity: 0.15;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 1;
     pointer-events: none;
 }
 
@@ -206,10 +207,10 @@ img { max-width: 100%; height: auto; display: block; }
     background: #1e3a5f;
     color: white;
     text-align: center;
-    padding: 32px 48px 40px;
+    padding: 20px 48px 24px;
 }
-.home-intro h1 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
-.home-intro-texto { font-size: 18px; opacity: 0.85; max-width: 700px; margin: 0 auto; }
+.home-intro h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.home-intro-texto { font-size: 15px; opacity: 0.85; max-width: 700px; margin: 0 auto; }
 .home-intro-texto p { margin-bottom: 8px; }
 
 /* ── Buttons ────────────────────────────────────────────────────── */
@@ -867,10 +868,10 @@ img { max-width: 100%; height: auto; display: block; }
     .hero-overlay { padding: 16px; }
     .hero-overlay h1 { font-size: 18px; }
     .hero-overlay p { font-size: 14px; }
-    .hero-default { min-height: 100px; }
-    .home-intro { padding: 20px 16px 28px; }
-    .home-intro h1 { font-size: 22px; }
-    .home-intro-texto { font-size: 15px; }
+    .hero-default { min-height: 180px; }
+    .home-intro { padding: 16px 16px 20px; }
+    .home-intro h1 { font-size: 19px; }
+    .home-intro-texto { font-size: 14px; }
 
     /* Seções */
     .section { padding: 24px 0; }
