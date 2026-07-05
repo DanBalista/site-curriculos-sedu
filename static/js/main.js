@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
             colunas.forEach(function(c) {
                 c.style.top = '';
                 c.style.bottom = '';
-                c.style.maxHeight = '';
                 c.style.display = '';
             });
             return;
@@ -51,11 +50,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const topo = Math.max(headerBottom, azulBottom) + GAP;
         const base = Math.min(window.innerHeight, footerTop) - GAP;
         const altura = Math.max(0, base - topo);
+        // Distância do fim da área branca até o rodapé da janela —
+        // usada como "bottom" para que o quadro fique preso dos dois lados
+        // (topo e base) e o cartaz fique centralizado por dentro (flex + justify-content:center)
+        const distanciaBase = Math.max(0, window.innerHeight - base);
 
         colunas.forEach(function(c) {
             c.style.top = topo + 'px';
-            c.style.bottom = 'auto';
-            c.style.maxHeight = altura + 'px';
+            c.style.bottom = distanciaBase + 'px';
             // Se a área branca visível ficou pequena demais, esconde
             c.style.display = altura < 90 ? 'none' : 'flex';
         });
