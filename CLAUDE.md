@@ -192,7 +192,7 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Banners rotativos por área (home ou categoria específica), com imagem nunca cortada/distorcida e tamanho configurável (pequeno/médio/grande)
 - [x] Deploy de teste em produção no PythonAnywhere (https://rabalista.pythonanywhere.com)
 - [x] Agendamento de publicação por data/hora futura (conteúdo fica invisível até a data chegar)
-- [x] Cartazes laterais de eventos na home (posição fixa, configurável por lado esquerdo/direito)
+- [x] Cartazes de eventos na home com tamanho configurável (pequeno/médio/grande) — desktop mostra nas laterais, mobile/tablet via botão flutuante
 - [x] Responsividade completa para celulares e tablets (breakpoints 1024px, 768px, 400px)
 - [x] Exclusão de comentários no admin (ação em lote + botão individual)
 
@@ -213,3 +213,4 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - O usuário não tem conhecimento de programação — sempre forneça comandos prontos para copiar e colar.
 - Widgets visuais do admin (`CategoriaPicker`, `IconPicker`) carregam o Font Awesome via CDN na própria `Media` da classe, pois o admin do Django não inclui o CDN usado no site público (`templates/base.html`).
 - O CSS dos widgets (`admin_picker.css`) usa `!important` em vários pontos porque o CSS padrão do Django Admin estiliza `<label>` genericamente (largura fixa, `display: block`), o que sobrescreveria a grade de botões sem isso.
+- **Cartazes**: no admin, ao criar/editar um cartaz, escolha o tamanho na seção "Posição e exibição" — a imagem nunca será distorcida (usa `object-fit: contain`). Em desktop (>1400px), aparecem fixos nas laterais; em mobile/tablet (≤1400px), um botão flutuante "Eventos" abre um painel deslizante com todos os cartazes ativos em grade. O botão só aparece se houver pelo menos um cartaz com "Ativo" marcado.
