@@ -318,9 +318,7 @@ img { max-width: 100%; height: auto; display: block; }
 .area-text p { font-size: 12.5px; color: var(--text-secondary); line-height: 1.4; }
 
 @media (max-width: 860px) {
-    .home-split { grid-template-columns: 1fr; gap: 32px; }
-    /* No celular, "Navegue por área" aparece antes dos recentes */
-    .home-areas { order: -1; }
+    .home-split { grid-template-columns: 1fr; gap: 24px; }
 }
 
 /* ── Grade de temas (índice geral, estilo do site antigo) ───────── */
@@ -815,9 +813,31 @@ img { max-width: 100%; height: auto; display: block; }
 .cat-banner-overlay h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
 .cat-banner-overlay p { font-size: 14px; opacity: 0.9; margin: 0; }
 
-/* ── Responsivo ─────────────────────────────────────────────────── */
+/* ── Responsivo — Tablet (até 1024px) ──────────────────────────── */
+@media (max-width: 1024px) {
+    .header-inner { padding: 0 16px; }
+    .nav-link { padding: 8px 8px; font-size: 13px; }
+    .search-input { width: 140px; }
+    .header-brasao { height: 40px; }
+    .header-geceb { height: 40px; }
+    .topic-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+}
+
+/* ── Responsivo — Celular (até 768px) ─────────────────────────── */
 @media (max-width: 768px) {
-    .header-inner { flex-wrap: wrap; height: auto; padding: 12px 16px; }
+    .container { padding: 0 16px; }
+
+    /* Header */
+    .header-inner {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+    .header-brasao { height: 36px; }
+    .header-geceb { height: 36px; }
+    .logo-title { font-size: 16px; }
+    .logo-subtitle { font-size: 10px; }
 
     .menu-toggle { display: block; }
 
@@ -826,30 +846,103 @@ img { max-width: 100%; height: auto; display: block; }
         width: 100%;
         flex-direction: column;
         gap: 0;
-        padding: 12px 0;
+        padding: 8px 0;
+        order: 4;
     }
     .nav.open { display: flex; }
-    .nav-link { padding: 12px 16px; border-radius: 0; }
+    .nav-link { padding: 12px 16px; border-radius: 0; font-size: 15px; }
 
-    .search-form { width: 100%; order: 3; }
+    .search-form { flex: 1; min-width: 0; order: 2; }
     .search-input { width: 100%; }
 
-    .hero-slide, .hero-slide img { min-height: 260px; height: 260px; }
-    .hero-overlay { padding: 24px; }
-    .hero-overlay h1 { font-size: 22px; }
-    .hero-default { padding: 48px 24px; }
-    .hero-default h1 { font-size: 26px; }
+    /* Hero */
+    .hero-slide { min-height: 200px; }
+    .hero-slide img { height: 200px; }
+    .hero-overlay { padding: 16px; }
+    .hero-overlay h1 { font-size: 18px; }
+    .hero-overlay p { font-size: 14px; }
+    .hero-default { padding: 32px 16px; }
+    .hero-default h1 { font-size: 22px; }
 
-    .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .category-card { padding: 20px 14px; }
+    /* Seções */
+    .section { padding: 24px 0; }
+    .section-title { font-size: 18px; margin-bottom: 16px; }
 
-    .content-grid { grid-template-columns: 1fr; }
+    /* Home split */
+    .home-split { grid-template-columns: 1fr; gap: 24px; }
+    .home-areas { order: -1; }
+
+    /* Cards de conteúdo */
+    .content-grid { grid-template-columns: 1fr; gap: 12px; }
     .content-layout { grid-template-columns: 1fr; }
 
-    .section { padding: 32px 0; }
-    .section-title { font-size: 20px; margin-bottom: 20px; }
+    /* Grade de temas (índice geral) */
+    .topic-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .topic-btn { padding: 10px 12px; gap: 10px; }
+    .topic-icon { width: 34px; height: 34px; font-size: 15px; }
+    .topic-label { font-size: 12px; }
 
+    /* Categorias */
+    .categories-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .category-card { padding: 16px 12px; }
+
+    /* Subcategorias e filtros */
+    .subcategories { flex-wrap: wrap; gap: 6px; }
+    .filters { flex-wrap: wrap; gap: 6px; }
+    .filter-chip { font-size: 12px; padding: 6px 10px; }
+
+    /* Page header (breadcrumb + título) */
+    .page-header { padding: 20px 0 16px; }
+    .page-header h1 { font-size: 20px; }
+    .breadcrumb { font-size: 11px; }
+
+    /* Texto introdutório */
+    .page-intro-body { font-size: 14px; padding: 12px 16px; }
+
+    /* Detalhe do conteúdo */
+    .content-detail { padding: 20px 16px; }
+
+    /* Comentários */
+    .form-row { grid-template-columns: 1fr; }
+    .comment-form-box { padding: 16px; }
+
+    /* Banners de categoria */
+    .cat-banner-item.tamanho-pequeno { height: 120px; }
+    .cat-banner-item.tamanho-medio { height: 180px; }
+    .cat-banner-item.tamanho-grande { height: 260px; }
+    .cat-banner-overlay { padding: 12px 16px; }
+    .cat-banner-overlay h3 { font-size: 14px; }
+    .cat-banner-overlay p { font-size: 12px; }
+
+    /* Footer */
+    .footer { padding: 32px 0 0; }
+    .footer-inner { grid-template-columns: 1fr; gap: 24px; }
+    .footer-bottom-inner { flex-direction: column; gap: 8px; text-align: center; }
+
+    /* Cartazes — ocultos no mobile */
     .cartazes-lateral { display: none; }
+
+    /* Busca */
+    .search-results { gap: 12px; }
+}
+
+/* ── Responsivo — Celular pequeno (até 400px) ─────────────────── */
+@media (max-width: 400px) {
+    .header-inner { padding: 8px 10px; gap: 6px; }
+    .header-brasao { height: 30px; }
+    .header-geceb { height: 30px; }
+    .logo-title { font-size: 14px; }
+    .logo-subtitle { font-size: 9px; }
+
+    .topic-grid { grid-template-columns: 1fr; }
+
+    .area-card { padding: 10px 12px; gap: 10px; }
+    .area-card .category-icon { width: 38px; height: 38px; font-size: 16px; }
+    .area-text h3 { font-size: 13px; }
+    .area-text p { font-size: 11px; }
+
+    .content-card .card-body h3 { font-size: 14px; }
+    .list-item { padding: 10px 12px; }
 }
 
 /* ── Cartazes laterais (eventos) ───────────────────────────────── */
