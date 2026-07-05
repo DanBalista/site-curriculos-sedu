@@ -113,8 +113,21 @@ class StatusPublicacao(models.TextChoices):
     ARQUIVADO = 'arquivado', 'Arquivado'
 
 
+class ConteudoQuerySet(models.QuerySet):
+    def publicados(self):
+        """Conteúdos com status 'Publicado' cuja data/hora de publicação já
+        chegou. Permite agendar publicações futuras: um conteúdo com status
+        Publicado e data no futuro fica invisível no site até aquele momento."""
+        return self.filter(
+            status=StatusPublicacao.PUBLICADO,
+            data_publicacao__lte=timezone.now(),
+        )
+
+
 class Conteudo(models.Model):
     """Modelo principal — qualquer conteúdo do site (documento, vídeo, post, link)"""
+    objects = ConteudoQuerySet.as_manager()
+
     titulo = models.CharField('Título', max_length=300)
     slug = models.SlugField('URL amigável', max_length=300, unique=True, blank=True)
     tipo = models.CharField('Tipo de conteúdo', max_length=20, choices=TipoConteudo.choices, default=TipoConteudo.POST)

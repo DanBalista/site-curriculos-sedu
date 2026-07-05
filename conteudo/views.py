@@ -9,8 +9,8 @@ def home(request):
     categorias = Categoria.objects.filter(ativa=True, categoria_pai__isnull=True)
     # Apenas banners sem categoria específica aparecem na home
     banners = Banner.objects.filter(ativo=True, categoria__isnull=True)
-    destaques = Conteudo.objects.filter(status='publicado', destaque=True)[:6]
-    recentes = Conteudo.objects.filter(status='publicado')[:8]
+    destaques = Conteudo.objects.publicados().filter(destaque=True)[:6]
+    recentes = Conteudo.objects.publicados()[:8]
 
     return render(request, 'home.html', {
         'categorias': categorias,
@@ -45,8 +45,7 @@ def categoria_detalhe(request, slug):
         })
 
     # Conteúdos desta categoria e das subcategorias
-    conteudos = Conteudo.objects.filter(
-        status='publicado',
+    conteudos = Conteudo.objects.publicados().filter(
         categoria__in=[categoria] + list(subcategorias)
     )
 
@@ -69,9 +68,9 @@ def categoria_detalhe(request, slug):
 
 def conteudo_detalhe(request, slug):
     """Página de detalhe de um conteúdo, com formulário de comentários."""
-    conteudo = get_object_or_404(Conteudo, slug=slug, status='publicado')
-    relacionados = Conteudo.objects.filter(
-        status='publicado', categoria=conteudo.categoria
+    conteudo = get_object_or_404(Conteudo.objects.publicados(), slug=slug)
+    relacionados = Conteudo.objects.publicados().filter(
+        categoria=conteudo.categoria
     ).exclude(pk=conteudo.pk)[:4]
 
     comentarios = conteudo.comentarios.filter(aprovado=True).order_by('data_criacao')
@@ -109,9 +108,7 @@ def busca(request):
     resultados = []
 
     if query:
-        resultados = Conteudo.objects.filter(
-            status='publicado'
-        ).filter(
+        resultados = Conteudo.objects.publicados().filter(
             Q(titulo__icontains=query) |
             Q(resumo__icontains=query) |
             Q(corpo__icontains=query)

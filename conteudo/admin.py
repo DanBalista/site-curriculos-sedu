@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.utils import timezone
 from django.db.models import Count
 from .models import Categoria, Conteudo, Banner, ConfiguracaoSite, Comentario
 from .forms import BannerAdminForm, ConteudoAdminForm
@@ -82,7 +83,12 @@ class ConteudoAdmin(admin.ModelAdmin):
         }),
         ('⚙️ Publicação', {
             'fields': ('status', 'destaque', 'ordem', 'autor', 'data_publicacao'),
-            'description': 'Status "Publicado" torna o conteúdo visível no site. "Destaque" aparece na home.',
+            'description': (
+                'Status "Publicado" torna o conteúdo visível no site. "Destaque" aparece na home. '
+                '📅 Agendamento: coloque uma data/hora futura em "Data de publicação" com status '
+                '"Publicado" — o conteúdo fica pronto mas só aparece no site automaticamente '
+                'quando a data/hora chegar.'
+            ),
         }),
     )
 
@@ -122,6 +128,14 @@ class ConteudoAdmin(admin.ModelAdmin):
     tipo_badge.admin_order_field = 'tipo'
 
     def status_badge(self, obj):
+        # Publicado com data futura = agendado, ainda não aparece no site.
+        if obj.status == 'publicado' and obj.data_publicacao > timezone.now():
+            return format_html(
+                '<span style="background:#7c3aed; color:white; padding:3px 10px; '
+                'border-radius:12px; font-size:11px; font-weight:600;">'
+                '⏰ Agendado — {}</span>',
+                obj.data_publicacao.strftime('%d/%m/%Y %H:%M')
+            )
         cores = {
             'rascunho': '#f59e0b',
             'publicado': '#10b981',
