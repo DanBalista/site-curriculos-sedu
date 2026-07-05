@@ -818,11 +818,20 @@ img { max-width: 100%; height: auto; display: block; }
 .cat-banner-overlay h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
 .cat-banner-overlay p { font-size: 14px; opacity: 0.9; margin: 0; }
 
+/* ── Responsivo — Tablet grande (até 1400px) ───────────────────── */
+@media (max-width: 1400px) and (min-width: 1025px) {
+    /* Com mais de 6 itens no nav, oculta os ícones para caber o texto */
+    .nav-link i { display: none; }
+    .nav-link { padding: 8px 10px; font-size: 13px; }
+    .search-input { width: 120px; }
+}
+
 /* ── Responsivo — Tablet (até 1024px) ──────────────────────────── */
 @media (max-width: 1024px) {
     .header-inner { padding: 0 16px; }
+    .nav-link i { display: none; }
     .nav-link { padding: 8px 8px; font-size: 13px; }
-    .search-input { width: 140px; }
+    .search-input { width: 120px; }
     .header-brasao { height: 40px; }
     .header-geceb { height: 40px; }
     .topic-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
