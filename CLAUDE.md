@@ -33,6 +33,8 @@ conteudo/                # App principal
     popular_descricoes.py   # Textos introdutórios das categorias (HTML)
     migrar_conteudo.py      # 102 itens de conteúdo migrados do WordPress
     migrar_orientacoes.py   # 129 documentos de Orientações Curriculares do WordPress
+    migrar_ifa.py           # Itinerários Formativos de Aprofundamento (IFA): 10 subcategorias, 14 docs
+    organizar_curriculo_atual.py  # Divide "Currículo Atual" em sub-botões por etapa de ensino
 templates/
   base.html              # Layout base (header, nav dinâmica, footer, ícone discreto de admin)
   home.html              # Home: hero/banners, "Conteúdos recentes" (esquerda) + "Navegue por área" (direita)
@@ -173,9 +175,14 @@ python manage.py popular_categorias    # Cria categorias e subcategorias
 python manage.py popular_descricoes    # Textos introdutórios das categorias
 python manage.py migrar_conteudo       # 102 itens de conteúdo do site original
 python manage.py migrar_orientacoes    # 129 documentos de Orientações Curriculares
+python manage.py migrar_ifa            # Itinerários Formativos de Aprofundamento (IFA)
+python manage.py organizar_curriculo_atual  # Sub-botões por etapa em "Currículo Atual"
 ```
 
-Todos são idempotentes (usam `get_or_create` ou verificam existência).
+Todos são idempotentes (usam `get_or_create` ou verificam existência). Os comandos
+`migrar_ifa` e `organizar_curriculo_atual` são autossuficientes: se o documento já
+existe no banco (de outra migração), eles MOVEM para a categoria/etapa correta em vez
+de duplicar. Usam slugs FIXOS para nunca criar subcategorias duplicadas.
 
 ## O que já foi feito
 
@@ -208,6 +215,9 @@ Todos são idempotentes (usam `get_or_create` ou verificam existência).
 - [x] Seletor visual de ícone (`IconPicker`) também no admin de Categoria, não só em Conteúdo
 - [x] Primeira leva de conteúdos "link" que ainda apontavam para páginas de texto do WordPress antigo convertidos em páginas nativas (`tipo='pagina'`) com comentários moderados no admin Django — trabalho de migrar os ~41 itens restantes está registrado como tarefa separada (ver nota abaixo)
 - [x] Categoria "Orientações Curriculares" com 129 documentos migrados do WordPress (16 subcategorias: EF Anos Iniciais/Finais, EM Formação Geral Básica, IFAs, Itinerários, Anos anteriores) — comando `migrar_orientacoes.py`
+- [x] Categoria principal "Itinerários Formativos de Aprofundamento (IFA)" (Navegue por área) com 10 subcategorias e 14 documentos — comando `migrar_ifa.py` (move docs existentes ou cria; slugs fixos; remove subcategorias vazias)
+- [x] "Currículo Atual" (dentro de Documentos Curriculares) dividido em sub-botões por etapa de ensino (Educação Infantil, EF Anos Iniciais, EF Anos Finais, Ensino Médio), como os acordeões do site antigo — comando `organizar_curriculo_atual.py`. Resoluções e Tema Integrador ficam como documentos gerais direto em "Currículo Atual"
+- [x] Menu do topo corrigido: em telas ≤1400px os ícones dos links de navegação são ocultados para os textos das categorias não ficarem cortados
 - [x] Cartazes laterais presos à área branca via CSS puro (`position: sticky`) — os cartazes agora são filhos da seção branca de conteúdo (`.home-conteudo`, `position: relative`); cada coluna é `position: absolute` presa ao topo e à base dessa seção e o bloco interno (`.cartazes-inner`) usa `position: sticky; top: 88px` para acompanhar a rolagem. Como são filhos da área branca, é fisicamente impossível invadirem o banner/faixa azul (acima) ou o rodapé (abaixo). Substituiu a abordagem anterior por JavaScript, que era frágil
 - [x] Nova ilustração do banner da home (`hero-ilustracao.png`) preenchendo o quadrante inteiro do banner (`object-fit: cover`, sem opacidade reduzida); quadro do texto "Currículo do Espírito Santo" abaixo do banner reduzido (fonte e padding menores) para que o banner de imagem fique visualmente maior que o quadro de texto
 
