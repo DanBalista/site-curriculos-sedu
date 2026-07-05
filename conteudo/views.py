@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.contrib import messages
-from .models import Categoria, Conteudo, Banner, Comentario
+from .models import Categoria, Conteudo, Banner, Comentario, Cartaz
 
 
 def home(request):
@@ -12,11 +12,16 @@ def home(request):
     destaques = Conteudo.objects.publicados().filter(destaque=True)[:6]
     recentes = Conteudo.objects.publicados()[:8]
 
+    cartazes_esq = Cartaz.objects.filter(ativo=True, lado='esquerdo')
+    cartazes_dir = Cartaz.objects.filter(ativo=True, lado='direito')
+
     return render(request, 'home.html', {
         'categorias': categorias,
         'banners': banners,
         'destaques': destaques,
         'recentes': recentes,
+        'cartazes_esq': cartazes_esq,
+        'cartazes_dir': cartazes_dir,
     })
 
 

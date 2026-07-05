@@ -116,4 +116,25 @@
     </div>
 </section>
 
+<!-- ── Cartazes laterais (eventos) ─────────────────────────────── -->
+{% if cartazes_esq %}
+<div class="cartazes-lateral cartazes-esq">
+    {% for c in cartazes_esq %}
+    <a href="{{ c.link }}" class="cartaz-item" target="_blank" rel="noopener" title="{{ c.titulo }}">
+        <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if cartazes_dir %}
+<div class="cartazes-lateral cartazes-dir">
+    {% for c in cartazes_dir %}
+    <a href="{{ c.link }}" class="cartaz-item" target="_blank" rel="noopener" title="{{ c.titulo }}">
+        <img src="{{ c.imagem.url }}" alt="{{ c.titulo }}">
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}

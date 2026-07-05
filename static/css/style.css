@@ -848,4 +848,44 @@ img { max-width: 100%; height: auto; display: block; }
 
     .section { padding: 32px 0; }
     .section-title { font-size: 20px; margin-bottom: 20px; }
+
+    .cartazes-lateral { display: none; }
+}
+
+/* ── Cartazes laterais (eventos) ───────────────────────────────── */
+.cartazes-lateral {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 90;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.cartazes-esq { left: 8px; }
+.cartazes-dir { right: 8px; }
+
+.cartaz-item {
+    display: block;
+    width: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    transition: transform 0.2s, box-shadow 0.2s;
+    opacity: 0.7;
+}
+.cartaz-item:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    opacity: 1;
+}
+.cartaz-item img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Só mostra cartazes em telas largas (monitor grande) */
+@media (max-width: 1400px) {
+    .cartazes-lateral { display: none; }
 }

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils import timezone
 from django.db.models import Count
-from .models import Categoria, Conteudo, Banner, ConfiguracaoSite, Comentario
+from .models import Categoria, Conteudo, Banner, ConfiguracaoSite, Comentario, Cartaz
 from .forms import BannerAdminForm, ConteudoAdminForm
 
 
@@ -268,6 +268,48 @@ class ComentarioAdmin(admin.ModelAdmin):
     def reprovar_selecionados(self, request, queryset):
         queryset.update(aprovado=False)
         self.message_user(request, f'{queryset.count()} comentário(s) ocultado(s).')
+
+
+# ── Cartazes ─────────────────────────────────────────────────────────
+@admin.register(Cartaz)
+class CartazAdmin(admin.ModelAdmin):
+    list_display = ['titulo', 'lado_badge', 'preview_imagem', 'ordem', 'ativo']
+    list_filter = ['lado', 'ativo']
+    list_editable = ['ordem', 'ativo']
+
+    fieldsets = (
+        ('🖼️ Cartaz do evento', {
+            'fields': ('titulo', 'imagem', 'link'),
+            'description': (
+                'Suba a imagem do cartaz e cole o link do evento. '
+                'O cartaz aparece discretamente nas laterais da página principal.'
+            ),
+        }),
+        ('⚙️ Posição e exibição', {
+            'fields': ('lado', 'ordem', 'ativo'),
+            'description': 'Escolha em qual lado da página o cartaz vai aparecer.',
+        }),
+    )
+
+    def lado_badge(self, obj):
+        cor = '#2d5a8e' if obj.lado == 'esquerdo' else '#7c3aed'
+        emoji = '⬅️' if obj.lado == 'esquerdo' else '➡️'
+        return format_html(
+            '<span style="background:{};color:white;padding:3px 10px;'
+            'border-radius:12px;font-size:11px;font-weight:600;">'
+            '{} {}</span>',
+            cor, emoji, obj.get_lado_display()
+        )
+    lado_badge.short_description = 'Lado'
+
+    def preview_imagem(self, obj):
+        if obj.imagem:
+            return format_html(
+                '<img src="{}" style="height:60px; border-radius:4px;" />',
+                obj.imagem.url
+            )
+        return '—'
+    preview_imagem.short_description = 'Preview'
 
 
 # ── Configuração do site ──────────────────────────────────────────────
