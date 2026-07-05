@@ -3,70 +3,66 @@ Cria a categoria principal "Itinerários Formativos de Aprofundamento (IFA)"
 com subcategorias e documentos migrados de:
 https://curriculo.sedu.es.gov.br/curriculo/documentos/
 
-Idempotente — pode rodar múltiplas vezes sem duplicar dados.
+O comando é IDEMPOTENTE e AUTOSSUFICIENTE: para cada documento, se já
+existir um Conteudo com a mesma URL (por exemplo, criado por outra
+migração anterior), ele é MOVIDO para a subcategoria correta do IFA;
+se não existir, é CRIADO. Rodar várias vezes não duplica nada.
 """
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+from django.utils.text import slugify
 from conteudo.models import Categoria, Conteudo
 
 B = 'https://curriculo.sedu.es.gov.br/curriculo/wp-content/uploads/'
 REF = B + '2023/01/Referenciais-Curriculares-para-Elaboracao-de-Itinerarios-Formativos-1-1.pdf'
 
-# (nome_subcategoria, icone, [(titulo_doc, url_pdf), ...])
+# (slug_subcategoria, nome_subcategoria, icone, [(titulo_doc, url_pdf), ...])
+# Os slugs são FIXOS (não gerados) para nunca criar duplicatas ao rodar de novo.
 SUBCATEGORIAS = [
-    ('Documentos Gerais dos IFAs', 'fas fa-file-alt', [
+    ('ifa-documentos-gerais-dos-ifas', 'Documentos Gerais dos IFAs', 'fas fa-file-alt', [
         ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
         ('Orientações para Elaboração dos Projetos Integradores dos IFAs',
          B + '2025/12/ORIENTACOES-PARA-ELABORACAO-DOS-PROJETOS-INTEGRADORES-3.pdf'),
-        ('IFA — Quatro Áreas do Conhecimento (Noturno)',
+        ('IFA — Quatro Áreas do Conhecimento',
          B + '2025/12/IFA-DAS-QUATRO-AREAS-DO-CONHECIMENTO-FINALIZADO.pdf'),
         ('IFA — Linguagens e Ciências Humanas e Sociais Aplicadas',
          B + '2025/12/IFA-LINGCHSA-6-1.pdf'),
         ('IFA — Matemática e Ciências da Natureza e suas Tecnologias',
          B + '2025/12/IFA-CNTMAT.pdf'),
     ]),
-    ('Educação Financeira e Fiscal', 'fas fa-coins', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-educacao-financeira-e-fiscal', 'Educação Financeira e Fiscal', 'fas fa-coins', [
         ('Documento Curricular — Educação Financeira e Fiscal (Matemática)',
          B + '2023/09/Curriculo-EM_Aprofundamento-da-area_-Matematica_-Alterado_15-09-23.pdf'),
     ]),
-    ('Terra, Vida e Cosmo', 'fas fa-globe', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-terra-vida-e-cosmo', 'Terra, Vida e Cosmo', 'fas fa-globe', [
         ('Documento Curricular — Terra, Vida e Cosmo (Ciências da Natureza)',
          B + '2022/04/Curriculo-EM_Aprofundamento-da-area_-CN_-Alterado_-20_04_22.pdf'),
     ]),
-    ('Mídias Digitais: Linguagens em Ação', 'fas fa-film', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-midias-digitais-linguagens-em-acao', 'Mídias Digitais: Linguagens em Ação', 'fas fa-film', [
         ('Documento Curricular — Mídias Digitais: Linguagens em Ação (Linguagens)',
          B + '2022/04/Curriculo-EM_Aprofundamento-da-area_-Linguagens_Alterado_19-04.pdf'),
     ]),
-    ('Modernização, Transformação Social e Meio Ambiente', 'fas fa-leaf', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-modernizacao-transformacao-social-e-meio', 'Modernização, Transformação Social e Meio Ambiente', 'fas fa-leaf', [
         ('Documento Curricular — Modernização, Transformação Social e Meio Ambiente (Ciências Humanas)',
          B + '2022/04/CurriculoEM_Aprofundamento-da-area-de-CHSA.pdf'),
     ]),
-    ('O Esporte, a Ciência e suas Linguagens', 'fas fa-running', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-o-esporte-a-ciencia-e-suas-linguagens', 'O Esporte, a Ciência e suas Linguagens', 'fas fa-running', [
         ('Documento Curricular — O Esporte, a Ciência e suas Linguagens (CN e Linguagens)',
          B + '2022/04/Curriculo-EM_Aprofundamento-entreareas_-CN.e-Linguagens_Alterado_20_04_22.pdf'),
     ]),
-    ('Energias Renováveis e Eficiência Energética', 'fas fa-solar-panel', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
-        ('Documento Curricular — Energias Renováveis e Eficiência Energética (CN, Mat e Linguagens)',
+    ('ifa-energias-renovaveis-e-eficiencia-energet', 'Energias Renováveis e Eficiência Energética', 'fas fa-solar-panel', [
+        ('Documento Curricular — Energias Renováveis e Eficiência Energética (CN, CHSA, Mat e Linguagens)',
          B + '2022/04/Curriculo-EM_Aprofundamento-entreareas_CN-CHSA-Mat-e-Linguagens_Alterado_20_04_22.pdf'),
     ]),
-    ('Narrativas Socioliterárias', 'fas fa-book-open', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-narrativas-socioliterarias', 'Narrativas Socioliterárias', 'fas fa-book-open', [
         ('Documento Curricular — Narrativas Socioliterárias: Literatura, Arte e Ciências Humanas',
          B + '2022/04/Curriculo-EM_Aprofundamento-entreareas_CHSA-e-Linguagens_Alterado-20_04_22.pdf'),
     ]),
-    ('Humanidades e Relações Socioambientais', 'fas fa-users', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-humanidades-e-relacoes-socioambientais', 'Humanidades e Relações Socioambientais', 'fas fa-users', [
         ('Documento Curricular — Humanidades e Relações Socioambientais (CN e Ciências Humanas)',
          B + '2022/04/Curriculo-EM_Aprofundamento-entreareas_-CHSA-e-CN_alterado_20-04-22.pdf'),
     ]),
-    ('Aspirações Docentes', 'fas fa-chalkboard-teacher', [
-        ('Referenciais Curriculares para a Elaboração de Itinerários Formativos', REF),
+    ('ifa-aspiracoes-docentes', 'Aspirações Docentes', 'fas fa-chalkboard-teacher', [
         ('Documento Curricular — Aspirações Docentes (Linguagens, Matemática, CN e Ciências Humanas)',
          B + '2022/04/Aspiracoes-Docentes-versao-revisada.pdf'),
     ]),
@@ -77,7 +73,6 @@ class Command(BaseCommand):
     help = 'Migra Itinerários Formativos de Aprofundamento (IFA) do WordPress'
 
     def handle(self, *args, **options):
-        # Categoria principal
         cat_principal, criada = Categoria.objects.get_or_create(
             slug='itinerarios-formativos-ifa',
             defaults={
@@ -88,24 +83,14 @@ class Command(BaseCommand):
                 'ativa': True,
             }
         )
-        if criada:
-            self.stdout.write(f'  ✔ Categoria principal criada: {cat_principal.nome}')
-        else:
-            self.stdout.write(f'  — Categoria já existe: {cat_principal.nome}')
+        self.stdout.write(('  ✔ Categoria principal criada' if criada
+                           else '  — Categoria principal já existe') + f': {cat_principal.nome}')
 
         total_subs = 0
-        total_docs = 0
+        movidos = 0
+        criados = 0
 
-        for ordem_sub, (nome_sub, icone_sub, docs) in enumerate(SUBCATEGORIAS, start=1):
-            slug_sub = nome_sub.lower()
-            slug_sub = ''.join(c if c.isalnum() or c == '-' else '-' for c in
-                               slug_sub.replace('ç', 'c').replace('ã', 'a').replace('á', 'a')
-                               .replace('é', 'e').replace('ê', 'e').replace('í', 'i')
-                               .replace('ó', 'o').replace('ô', 'o').replace('ú', 'u')
-                               .replace('â', 'a').replace('õ', 'o').replace('à', 'a')
-                               .replace(' ', '-').replace(':', '').replace(',', ''))
-            slug_sub = f'ifa-{slug_sub[:40]}'.strip('-')
-
+        for ordem_sub, (slug_sub, nome_sub, icone_sub, docs) in enumerate(SUBCATEGORIAS, start=1):
             sub, criada_sub = Categoria.objects.get_or_create(
                 slug=slug_sub,
                 defaults={
@@ -120,17 +105,32 @@ class Command(BaseCommand):
                 total_subs += 1
 
             for titulo, url in docs:
-                slug_doc = titulo.lower()
-                slug_doc = ''.join(c if c.isalnum() or c == '-' else '-' for c in
-                                   slug_doc.replace('ç', 'c').replace('ã', 'a').replace('á', 'a')
-                                   .replace('é', 'e').replace('ê', 'e').replace('í', 'i')
-                                   .replace('ó', 'o').replace('ô', 'o').replace('ú', 'u')
-                                   .replace('â', 'a').replace('õ', 'o').replace('à', 'a')
-                                   .replace(' ', '-').replace(':', '').replace(',', '')
-                                   .replace('"', '').replace("'", ''))
-                slug_doc = f'ifa-{slug_doc[:50]}'.strip('-')
-
-                if not Conteudo.objects.filter(url_externa=url).exists():
+                doc = Conteudo.objects.filter(url_externa=url).first()
+                if doc:
+                    # Já existe (talvez em outra categoria): move para o IFA
+                    mudou = False
+                    if doc.categoria_id != sub.id:
+                        doc.categoria = sub
+                        mudou = True
+                    if doc.titulo != titulo:
+                        doc.titulo = titulo
+                        mudou = True
+                    if doc.status != 'publicado':
+                        doc.status = 'publicado'
+                        mudou = True
+                    if mudou:
+                        doc.save()
+                        movidos += 1
+                        self.stdout.write(f'      → movido/atualizado: {titulo[:55]}')
+                else:
+                    # Não existe: cria
+                    slug_doc = ('ifa-' + slugify(titulo))[:50]
+                    # garante slug único
+                    base_slug = slug_doc
+                    i = 2
+                    while Conteudo.objects.filter(slug=slug_doc).exists():
+                        slug_doc = f'{base_slug[:46]}-{i}'
+                        i += 1
                     Conteudo.objects.create(
                         titulo=titulo,
                         slug=slug_doc,
@@ -140,9 +140,22 @@ class Command(BaseCommand):
                         categoria=sub,
                         data_publicacao=timezone.now(),
                     )
-                    total_docs += 1
+                    criados += 1
+                    self.stdout.write(f'      + criado: {titulo[:55]}')
+
+        # Limpeza: remove subcategorias do IFA que ficaram vazias
+        # (duplicatas antigas com slug diferente, sem nenhum documento)
+        slugs_validos = {s[0] for s in SUBCATEGORIAS}
+        vazias = Categoria.objects.filter(categoria_pai=cat_principal).exclude(slug__in=slugs_validos)
+        removidas = 0
+        for v in vazias:
+            if not Conteudo.objects.filter(categoria=v).exists():
+                self.stdout.write(f'      × removendo subcategoria vazia duplicada: {v.slug}')
+                v.delete()
+                removidas += 1
 
         self.stdout.write(self.style.SUCCESS(
-            f'\n✅ Concluído: 1 categoria principal, {total_subs} subcategorias criadas, '
-            f'{total_docs} documentos criados.'
+            f'\n✅ Concluído: {total_subs} subcategorias novas, '
+            f'{movidos} documentos movidos/atualizados, {criados} documentos criados, '
+            f'{removidas} subcategorias vazias removidas.'
         ))
