@@ -75,6 +75,7 @@ python manage.py migrar_material_apoio        # 5 docs
 python manage.py migrar_projetos_integradores # 5 subcats
 python manage.py migrar_rpe                   # 8 subcats, 42 apostilas
 python manage.py migrar_olimpiadas            # 9 subcats de olimpíadas
+python manage.py curar_recentes                # Marca a seleção oficial de "Conteúdos recentes"
 ```
 **Todos são idempotentes** (rodar 2x = mesmo resultado).
 
@@ -89,7 +90,8 @@ python manage.py migrar_olimpiadas            # 9 subcats de olimpíadas
 4. **`migrar_rpe`** — Nova categoria "Rotinas Pedagógicas Escolares" com **42 apostilas** em 8 subcategorias
 5. **`migrar_olimpiadas`** — Categoria "Olimpíadas" reorganizada com 9 subcategorias oficiais + texto introdutório
 6. **Ajustes visuais**: barra inferior do rodapé reduzida (18px, azul médio, texto branco, tudo inline); scrollbar em "Conteúdos recentes" e "Navegue por área"; botão "Eventos" mobile agora só ≤900px
-7. **"Conteúdos recentes" curado manualmente**: novo campo `recente` no modelo Conteudo. Checkbox no admin (abaixo de "Destaque"). Só itens marcados aparecem na seção da home. Migração `0009_conteudo_recente`
+7. **"Conteúdos recentes" curado**: novo campo `recente` no modelo Conteudo. Checkbox no admin (abaixo de "Destaque"). Só itens marcados aparecem na seção da home. Migração `0009_conteudo_recente`
+8. **Curadoria automatizada**: como `db.sqlite3` não vai pelo Git (cada ambiente tem seu banco), o comando `curar_recentes` marca automaticamente os mesmos 5 itens em qualquer ambiente — **rode esse comando sempre que configurar o site em um computador novo** (não precisa marcar manualmente no admin)
 
 ### Problemas resolvidos recentemente
 - ❌ Cartazes invadindo faixa azul do header/footer → ✅ CSS puro (position: sticky) agora prende ao branco
@@ -186,6 +188,8 @@ site-curriculos-sedu/
 
 - [ ] Clonar do GitHub OU copiar pasta do pendrive
 - [ ] Criar venv e instalar dependências (`pip install -r requirements.txt`)
+- [ ] **Se clonou do GitHub (banco vazio)**: rodar todos os comandos da seção "Comandos essenciais" acima, na ordem, terminando com `curar_recentes` — isso popula o banco do zero e já deixa "Conteúdos recentes" com a curadoria certa, sem precisar clicar em nada no admin
+- [ ] **Se copiou a pasta pelo pendrive** (banco já vem preenchido): não precisa rodar os comandos de novo, só `python manage.py migrate` para garantir que a estrutura está em dia
 - [ ] Rodar `python manage.py runserver`
 - [ ] Abrir http://127.0.0.1:8000 no navegador
 - [ ] Testar admin em http://127.0.0.1:8000/admin/

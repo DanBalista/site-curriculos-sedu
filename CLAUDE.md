@@ -39,6 +39,7 @@ conteudo/                # App principal
     migrar_projetos_integradores.py  # Categoria principal "Projetos Integradores" (5 subcategorias)
     migrar_rpe.py            # Categoria "Rotinas Pedagógicas Escolares (RPE)" (8 subcategorias, 42 docs)
     migrar_olimpiadas.py     # Categoria "Olimpíadas" (9 subcategorias, 9 links oficiais)
+    curar_recentes.py        # Marca a curadoria oficial de "Conteúdos recentes" da home
 templates/
   base.html              # Layout base (header, nav dinâmica, footer, ícone discreto de admin)
   home.html              # Home: hero/banners, "Conteúdos recentes" (esquerda) + "Navegue por área" (direita)
@@ -189,6 +190,7 @@ python manage.py migrar_material_apoio      # Subcategoria "Material de Apoio" e
 python manage.py migrar_projetos_integradores  # Categoria "Projetos Integradores" (Navegue por área)
 python manage.py migrar_rpe                    # Categoria "Rotinas Pedagógicas Escolares (RPE)"
 python manage.py migrar_olimpiadas             # Categoria "Olimpíadas" com 9 subcategorias
+python manage.py curar_recentes                 # Marca a seleção oficial de "Conteúdos recentes"
 ```
 
 Todos são idempotentes (usam `get_or_create` ou verificam existência). Os comandos
@@ -235,7 +237,8 @@ de duplicar. Usam slugs FIXOS para nunca criar subcategorias duplicadas.
 - [x] Cartazes laterais presos à área branca via CSS puro (`position: sticky`) — os cartazes agora são filhos da seção branca de conteúdo (`.home-conteudo`, `position: relative`); cada coluna é `position: absolute` presa ao topo e à base dessa seção e o bloco interno (`.cartazes-inner`) usa `position: sticky; top: 88px` para acompanhar a rolagem. Como são filhos da área branca, é fisicamente impossível invadirem o banner/faixa azul (acima) ou o rodapé (abaixo). Substituiu a abordagem anterior por JavaScript, que era frágil
 - [x] Nova ilustração do banner da home (`hero-ilustracao.png`) preenchendo o quadrante inteiro do banner (`object-fit: cover`, sem opacidade reduzida); quadro do texto "Currículo do Espírito Santo" abaixo do banner reduzido (fonte e padding menores) para que o banner de imagem fique visualmente maior que o quadro de texto
 - [x] Categoria principal "Olimpíadas" (Navegue por área) reorganizada com texto introdutório completo e 9 subcategorias oficiais migradas de `curriculo.sedu.es.gov.br/curriculo/olimpiadas/`: OBF, OBFEP, OLITEF, Movimento Meninas Olímpiadas, Empreendedorismo, Biologia Sintética, Prêmio Jovem Cientista, Bem Público (FGV), Programa Jovem Senador. Cada olimpíada tem um link "Saiba mais" para o site oficial — comando `migrar_olimpiadas.py`. Subcategorias antigas ("Olimpíadas de Física/Matemática/Biologia", "Educação Financeira", "Empreendedorismo", "Outras Competições") foram substituídas
-- [x] Seção "Conteúdos recentes" da home passa a ser **curada manualmente** — antes mostrava automaticamente os 8 mais recentes por `data_publicacao`, agora mostra apenas itens marcados com o novo campo `recente=True`. Checkbox "Aparecer em Conteúdos recentes" fica logo abaixo de "Destaque" no admin, tanto no formulário quanto editável direto na lista (`list_editable`). Se nenhum item estiver marcado, aparece "Nenhum conteúdo recente" (comportamento esperado — precisa marcar). Migração `0009_conteudo_recente`
+- [x] Seção "Conteúdos recentes" da home passa a ser **curada** — antes mostrava automaticamente os 8 mais recentes por `data_publicacao`, agora mostra apenas itens marcados com o novo campo `recente=True`. Checkbox "Aparecer em Conteúdos recentes" fica logo abaixo de "Destaque" no admin, tanto no formulário quanto editável direto na lista (`list_editable`). Migração `0009_conteudo_recente`
+- [x] Comando `curar_recentes.py` — como o `db.sqlite3` não é versionado no Git (cada ambiente tem o seu banco), esse comando marca automaticamente a seleção oficial de 5 itens em "Conteúdos recentes" (por URL, igual aos comandos de migração), sem precisar clicar manualmente no admin em cada ambiente (local, PythonAnywhere, outro computador). É a fonte da verdade da curadoria — para trocar a seleção, edite a lista `URLS_RECENTES` no arquivo e rode o comando de novo (ele marca os da lista e desmarca quem não estiver mais nela). Idempotente
 - [x] Barra inferior do rodapé reduzida ao mínimo (18px de altura, fonte 11px), fundo azul médio `#3b6fa8` com texto branco, tudo em uma única linha (© + ícone admin lado a lado). Antes tinha padding grande e opacidade baixa
 - [x] Scrollbar interna adicionada às seções "Conteúdos recentes" (esquerda) e "Navegue por área" (direita) da home — `max-height: 600px; overflow-y: auto` com scrollbar estilizada em azul. Necessário porque essas seções tendem a crescer muito com adição de novos conteúdos/categorias
 - [x] Botão flutuante "Eventos" (cartazes mobile) só aparece agora em telas ≤900px (antes ≤1400px, o que fazia ele aparecer atrás/sobreposto a elementos do desktop pequeno)
