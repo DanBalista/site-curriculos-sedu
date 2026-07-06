@@ -38,6 +38,7 @@ conteudo/                # App principal
     migrar_material_apoio.py      # Subcategoria "Material de Apoio" dentro de Currículo Atual (5 docs)
     migrar_projetos_integradores.py  # Categoria principal "Projetos Integradores" (5 subcategorias)
     migrar_rpe.py            # Categoria "Rotinas Pedagógicas Escolares (RPE)" (8 subcategorias, 42 docs)
+    migrar_olimpiadas.py     # Categoria "Olimpíadas" (9 subcategorias, 9 links oficiais)
 templates/
   base.html              # Layout base (header, nav dinâmica, footer, ícone discreto de admin)
   home.html              # Home: hero/banners, "Conteúdos recentes" (esquerda) + "Navegue por área" (direita)
@@ -114,7 +115,7 @@ Singleton (pk=1). `nome_site`, `descricao`, `email_contato`, `telefone`, `endere
 6. **Programas** (fas fa-project-diagram) — subcategorias: Educar para a Paz, Mais Leitores, Educação Ambiental, Sucesso Escolar
 7. **Livro Didático** (fas fa-book-reader)
 8. **Modalidades e Diversidade** (fas fa-users) — subcategorias: EJA — Documentos, Educação do Campo, Educação Quilombola, Educação Indígena, Relações Étnico-Raciais, Socioeducação
-9. **Olimpíadas e Competições** (fas fa-trophy)
+9. **Olimpíadas** (fas fa-trophy) — 9 subcategorias: OBF, OBFEP, OLITEF, Movimento Meninas Olímpiadas, Olimpíada do Empreendedorismo, Biologia Sintética, Prêmio Jovem Cientista, Olimpíada do Bem Público (FGV), Programa Jovem Senador. Texto introdutório migrado do WordPress
 10. **Institucional** (fas fa-landmark)
 
 ## Design system (CSS)
@@ -186,6 +187,7 @@ python manage.py organizar_curriculo_atual  # Sub-botões por etapa em "Currícu
 python manage.py migrar_material_apoio      # Subcategoria "Material de Apoio" em Currículo Atual
 python manage.py migrar_projetos_integradores  # Categoria "Projetos Integradores" (Navegue por área)
 python manage.py migrar_rpe                    # Categoria "Rotinas Pedagógicas Escolares (RPE)"
+python manage.py migrar_olimpiadas             # Categoria "Olimpíadas" com 9 subcategorias
 ```
 
 Todos são idempotentes (usam `get_or_create` ou verificam existência). Os comandos
@@ -231,6 +233,10 @@ de duplicar. Usam slugs FIXOS para nunca criar subcategorias duplicadas.
 - [x] Menu do topo corrigido: em telas ≤1400px os ícones dos links de navegação são ocultados para os textos das categorias não ficarem cortados
 - [x] Cartazes laterais presos à área branca via CSS puro (`position: sticky`) — os cartazes agora são filhos da seção branca de conteúdo (`.home-conteudo`, `position: relative`); cada coluna é `position: absolute` presa ao topo e à base dessa seção e o bloco interno (`.cartazes-inner`) usa `position: sticky; top: 88px` para acompanhar a rolagem. Como são filhos da área branca, é fisicamente impossível invadirem o banner/faixa azul (acima) ou o rodapé (abaixo). Substituiu a abordagem anterior por JavaScript, que era frágil
 - [x] Nova ilustração do banner da home (`hero-ilustracao.png`) preenchendo o quadrante inteiro do banner (`object-fit: cover`, sem opacidade reduzida); quadro do texto "Currículo do Espírito Santo" abaixo do banner reduzido (fonte e padding menores) para que o banner de imagem fique visualmente maior que o quadro de texto
+- [x] Categoria principal "Olimpíadas" (Navegue por área) reorganizada com texto introdutório completo e 9 subcategorias oficiais migradas de `curriculo.sedu.es.gov.br/curriculo/olimpiadas/`: OBF, OBFEP, OLITEF, Movimento Meninas Olímpiadas, Empreendedorismo, Biologia Sintética, Prêmio Jovem Cientista, Bem Público (FGV), Programa Jovem Senador. Cada olimpíada tem um link "Saiba mais" para o site oficial — comando `migrar_olimpiadas.py`. Subcategorias antigas ("Olimpíadas de Física/Matemática/Biologia", "Educação Financeira", "Empreendedorismo", "Outras Competições") foram substituídas
+- [x] Barra inferior do rodapé reduzida ao mínimo (18px de altura, fonte 11px), fundo azul médio `#3b6fa8` com texto branco, tudo em uma única linha (© + ícone admin lado a lado). Antes tinha padding grande e opacidade baixa
+- [x] Scrollbar interna adicionada às seções "Conteúdos recentes" (esquerda) e "Navegue por área" (direita) da home — `max-height: 600px; overflow-y: auto` com scrollbar estilizada em azul. Necessário porque essas seções tendem a crescer muito com adição de novos conteúdos/categorias
+- [x] Botão flutuante "Eventos" (cartazes mobile) só aparece agora em telas ≤900px (antes ≤1400px, o que fazia ele aparecer atrás/sobreposto a elementos do desktop pequeno)
 
 ## O que falta / próximos passos possíveis
 
