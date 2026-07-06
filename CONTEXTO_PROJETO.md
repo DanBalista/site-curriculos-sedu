@@ -89,6 +89,7 @@ python manage.py migrar_olimpiadas            # 9 subcats de olimpíadas
 4. **`migrar_rpe`** — Nova categoria "Rotinas Pedagógicas Escolares" com **42 apostilas** em 8 subcategorias
 5. **`migrar_olimpiadas`** — Categoria "Olimpíadas" reorganizada com 9 subcategorias oficiais + texto introdutório
 6. **Ajustes visuais**: barra inferior do rodapé reduzida (18px, azul médio, texto branco, tudo inline); scrollbar em "Conteúdos recentes" e "Navegue por área"; botão "Eventos" mobile agora só ≤900px
+7. **"Conteúdos recentes" curado manualmente**: novo campo `recente` no modelo Conteudo. Checkbox no admin (abaixo de "Destaque"). Só itens marcados aparecem na seção da home. Migração `0009_conteudo_recente`
 
 ### Problemas resolvidos recentemente
 - ❌ Cartazes invadindo faixa azul do header/footer → ✅ CSS puro (position: sticky) agora prende ao branco

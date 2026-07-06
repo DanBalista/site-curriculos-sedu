@@ -48,9 +48,9 @@ class CategoriaAdmin(admin.ModelAdmin):
 @admin.register(Conteudo)
 class ConteudoAdmin(admin.ModelAdmin):
     form = ConteudoAdminForm
-    list_display = ['titulo', 'tipo_badge', 'area_destino', 'status_badge', 'destaque', 'data_publicacao']
-    list_filter = ['tipo', 'status', 'destaque', 'categoria__categoria_pai', 'categoria']
-    list_editable = ['destaque']
+    list_display = ['titulo', 'tipo_badge', 'area_destino', 'status_badge', 'destaque', 'recente', 'data_publicacao']
+    list_filter = ['tipo', 'status', 'destaque', 'recente', 'categoria__categoria_pai', 'categoria']
+    list_editable = ['destaque', 'recente']
     search_fields = ['titulo', 'resumo', 'corpo']
     date_hierarchy = 'data_publicacao'
     prepopulated_fields = {'slug': ('titulo',)}
@@ -89,9 +89,13 @@ class ConteudoAdmin(admin.ModelAdmin):
             ),
         }),
         ('⚙️ Publicação', {
-            'fields': ('status', 'destaque', 'ordem', 'autor', 'data_publicacao'),
+            'fields': ('status', 'destaque', 'recente', 'ordem', 'autor', 'data_publicacao'),
             'description': (
-                'Status "Publicado" torna o conteúdo visível no site. "Destaque" aparece na home. '
+                'Status "Publicado" torna o conteúdo visível no site. '
+                '"Destaque" aparece na seção de destaques da home. '
+                '"Aparecer em Conteúdos recentes" adiciona à lista lateral esquerda da home '
+                '(marque só nos itens que você quer destacar como recentes; se desmarcar, o item '
+                'continua aparecendo normalmente na categoria escolhida). '
                 '📅 Agendamento: coloque uma data/hora futura em "Data de publicação" com status '
                 '"Publicado" — o conteúdo fica pronto mas só aparece no site automaticamente '
                 'quando a data/hora chegar.'

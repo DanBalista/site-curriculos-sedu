@@ -10,7 +10,8 @@ def home(request):
     # Apenas banners sem categoria específica aparecem na home
     banners = Banner.objects.filter(ativo=True, categoria__isnull=True)
     destaques = Conteudo.objects.publicados().filter(destaque=True)[:6]
-    recentes = Conteudo.objects.publicados()[:8]
+    # "Conteúdos recentes" mostra APENAS itens marcados como recente=True no admin
+    recentes = Conteudo.objects.publicados().filter(recente=True)
 
     cartazes_esq = Cartaz.objects.filter(ativo=True, lado='esquerdo')
     cartazes_dir = Cartaz.objects.filter(ativo=True, lado='direito')

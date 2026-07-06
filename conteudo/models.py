@@ -177,6 +177,12 @@ class Conteudo(models.Model):
         'Destaque na home', default=False,
         help_text='Marque para exibir este conteúdo na página principal'
     )
+    recente = models.BooleanField(
+        'Aparecer em "Conteúdos recentes"', default=False,
+        help_text='Se marcado, este item aparece na seção "Conteúdos recentes" da '
+                  'home (abaixo do banner, à esquerda). Se desmarcado, aparece só '
+                  'na categoria escolhida.'
+    )
     ordem = models.PositiveIntegerField('Ordem de exibição', default=0)
 
     # Datas
